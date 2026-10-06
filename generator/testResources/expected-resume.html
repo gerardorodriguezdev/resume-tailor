@@ -1,0 +1,201 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Resume</title>
+    <style>* {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Helvetica Neue, Helvetica, Arial, Segoe UI, sans-serif;
+        font-size: 10.5pt;
+        line-height: 1.5;
+        color: #2f3542;
+    }
+
+    .resume {
+        max-width: 190mm;
+        margin: 0 auto;
+        padding: 0 16mm;
+    }
+
+    .resume-header {
+        margin-bottom: 6mm;
+    }
+
+    h1 {
+        font-size: 20pt;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        line-height: 1.2;
+        color: #16324f;
+        margin-top: 0;
+        margin-bottom: 1.5mm;
+    }
+
+    .resume-header-contact {
+        white-space: pre-line;
+        font-size: 9.5pt;
+        color: #5b6470;
+    }
+
+    section {
+        margin-bottom: 4mm;
+    }
+
+    h2 {
+        font-size: 11.5pt;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #16324f;
+        border-bottom: 0.6pt solid #c3ccd6;
+        padding-bottom: 1.2mm;
+        margin-top: 0;
+        margin-bottom: 2.5mm;
+    }
+
+    .section-content {
+        text-align: justify;
+    }
+
+    .section-content p {
+        margin: 0;
+    }
+    </style>
+</head>
+<body>
+<div class="resume">
+    <header class="resume-header">
+        <h1>Contact</h1>
+        <div class="resume-header-contact">john.doe@example.com | +1 555 1234 | linkedin.com/in/johndoe |
+            github.com/johndoe
+        </div>
+    </header>
+    <section>
+        <h2>summary</h2>
+        <div class="section-content">
+            <p>Senior software engineer with 10+ years of experience building scalable backend systems.</p>
+            <p>Specialized in Kotlin, distributed systems, and event-driven architectures.</p>
+            <p>Passionate about developer experience, observability, and mentoring teams.</p>
+        </div>
+    </section>
+    <section>
+        <h2>experience</h2>
+        <div class="section-content">
+            <p>Senior Software Engineer - Acme Corp (2021 - Present)</p>
+            <p>- Led the migration of a monolith to event-driven microservices, cutting p99 latency by 40%.</p>
+            <p>- Designed a multi-tenant billing pipeline processing 5M invoices per day.</p>
+            <p>- Mentored a team of 6 engineers and drove adoption of Kotlin across the org.</p>
+            <p>- Introduced SLO-based alerting that reduced on-call noise by 60%.</p>
+            <p>- Owned the roadmap for the payments platform serving 20 markets.</p>
+            <p>- Ran load tests before every major release, preventing 3 production incidents.</p>
+            <p>Software Engineer - Globex (2018 - 2021)</p>
+            <p>- Built a real-time fraud detection service scoring 10k events per second.</p>
+            <p>- Reduced database costs by 35% by introducing read replicas and caching.</p>
+            <p>- Shipped a partner API used by 200+ external integrations.</p>
+            <p>- Automated load testing, catching regressions before every release.</p>
+            <p>- Ran quarterly architecture reviews for the backend guild.</p>
+            <p>Software Engineer - Initech (2016 - 2018)</p>
+            <p>- Developed inventory management features for a SaaS platform.</p>
+            <p>- Improved CI pipelines, cutting build times from 25 to 8 minutes.</p>
+            <p>- Implemented role-based access control across 4 products.</p>
+            <p>- Collaborated with design to ship an accessible UI component library.</p>
+            <p>Junior Developer - Umbrella (2014 - 2016)</p>
+            <p>- Maintained internal reporting tools used by 15 departments.</p>
+            <p>- Wrote integration tests that raised coverage from 40% to 80%.</p>
+            <p>- Migrated legacy PHP endpoints to a modern REST API.</p>
+        </div>
+    </section>
+    <section>
+        <h2>projects</h2>
+        <div class="section-content">
+            <p>OpenLedger - Double-entry bookkeeping library for Kotlin</p>
+            <p>- Maintained an OSS library with 2k stars and 40 contributors.</p>
+            <p>- Published 30+ releases with a fully automated changelog pipeline.</p>
+            <p>Dashboards-as-Code - Internal observability toolkit</p>
+            <p>- Lets teams define Grafana dashboards in YAML and review them in PRs.</p>
+            <p>- Adopted by 12 teams and cut dashboard drift to zero.</p>
+            <p>DevBox - Reproducible development environments</p>
+            <p>- Built on Docker Compose with hot reload for 5 services.</p>
+            <p>- Onboarding time for new engineers dropped from 2 days to 2 hours.</p>
+        </div>
+    </section>
+    <section>
+        <h2>skills</h2>
+        <div class="section-content">
+            <p>Languages: Kotlin, Java, TypeScript, Python, SQL</p>
+            <p>Frameworks: Ktor, Spring Boot, React, Next.js</p>
+            <p>Infrastructure: Kubernetes, Terraform, AWS, GCP</p>
+            <p>Data: PostgreSQL, Kafka, Redis, Elasticsearch</p>
+            <p>Observability: Prometheus, Grafana, OpenTelemetry</p>
+            <p>Practices: TDD, DDD, event sourcing, CI/CD</p>
+            <p>Tools: Docker, Git, GitHub Actions, Playwright</p>
+            <p>Other: technical writing, public speaking, mentoring</p>
+        </div>
+    </section>
+    <section>
+        <h2>education</h2>
+        <div class="section-content">
+            <p>MSc Computer Science - State University (2012 - 2014)</p>
+            <p>- Thesis on consistency models in distributed key-value stores.</p>
+            <p>BSc Software Engineering - City College (2008 - 2012)</p>
+            <p>- Graduated cum laude, GPA 3.8/4.0.</p>
+        </div>
+    </section>
+    <section>
+        <h2>certifications</h2>
+        <div class="section-content">
+            <p>AWS Certified Solutions Architect - Professional</p>
+            <p>Kubernetes Certified Application Developer (CKAD)</p>
+            <p>Google Cloud Professional Data Engineer</p>
+            <p>Certified Scrum Master (CSM)</p>
+            <p>Oracle Certified Professional, Java SE 11</p>
+            <p>Kotlin Developer Certification (JetBrains)</p>
+        </div>
+    </section>
+    <section>
+        <h2>open source</h2>
+        <div class="section-content">
+            <p>kotlinx-serialization - Contributor (2019 - Present)</p>
+            <p>- Added support for custom serial names and binary formats.</p>
+            <p>ktor - Contributor (2020 - Present)</p>
+            <p>- Improved WebSocket reconnect behavior and documentation.</p>
+            <p>kotest - Contributor (2021 - Present)</p>
+            <p>- Added new matchers and fixed flaky property tests.</p>
+            <p>awesome-kotlin - Maintainer (2022 - Present)</p>
+            <p>- Curated 400+ entries and automated link checking.</p>
+        </div>
+    </section>
+    <section>
+        <h2>speaking</h2>
+        <div class="section-content">
+            <p>&quot;Kafka at Scale: Lessons from 5M Events per Second&quot; - KotlinConf (2023)</p>
+            <p>&quot;SLOs That Don't Page You at 3am&quot; - DevOpsDays (2022)</p>
+            <p>&quot;Migrating a Monolith Without Losing Sleep&quot; - DDD Europe (2021)</p>
+            <p>&quot;Property-Based Testing in Practice&quot; - JBCNConf (2020)</p>
+            <p>Guest lecturer, Distributed Systems, State University (2019 - Present)</p>
+        </div>
+    </section>
+    <section>
+        <h2>awards</h2>
+        <div class="section-content">
+            <p>Acme Corp Engineering Excellence Award (2023)</p>
+            <p>Speaker of the Year, local Kotlin user group (2022)</p>
+            <p>Top 10 finalist, Global Hackathon for Good (2020)</p>
+            <p>Employee of the Quarter, Globex (2019)</p>
+        </div>
+    </section>
+    <section>
+        <h2>languages</h2>
+        <div class="section-content">
+            <p>English - native</p>
+            <p>Spanish - professional working proficiency</p>
+            <p>German - elementary</p>
+        </div>
+    </section>
+</div>
+</body>
+</html>
