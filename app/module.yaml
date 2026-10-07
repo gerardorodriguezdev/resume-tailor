@@ -1,9 +1,12 @@
 product: jvm/app
 
 dependencies:
+  - //generator
   - $compose.desktop.currentOs
   - $compose.material3
   - $compose.hotReload.runtimeApi
+  - $libs.kotlinx.coroutines.core
+  - $libs.androidx.lifecycle.viewmodel.compose
 
 settings:
   compose: enabled
