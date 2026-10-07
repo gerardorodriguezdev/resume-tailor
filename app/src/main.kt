@@ -6,24 +6,17 @@ import presentation.AwtPathPicker
 import presentation.MainScreenViewModel
 import ui.screens.MainScreen
 import utils.DefaultDispatchersProvider
-import utils.NoOpLogger
 
 fun main() {
     systemSetup()
 
     val pathPicker = AwtPathPicker()
 
-    val resumeGenerator = ResumeGenerator.build(
-        apiKey = System.getenv("API_KEY"),
-        logger = NoOpLogger,
-    )
-
     val dispatchersProvider = DefaultDispatchersProvider()
 
     singleWindowApplication(title = "Resume Tailor") {
         val viewModel = viewModel {
             MainScreenViewModel(
-                resumeGenerator = resumeGenerator,
                 pathPicker = pathPicker,
                 dispatchersProvider = dispatchersProvider,
             )

@@ -34,7 +34,7 @@ internal fun MainScreen(
                     placeholder = "Website url",
                     field = state.urlField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeUrl(it)) },
-                    error = if (state.urlField.isValid) null else "Invalid URL",
+                    error = if (state.urlField.value != null && !state.urlField.isValid) "Invalid URL" else null, //TODO: Fix
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -42,7 +42,15 @@ internal fun MainScreen(
                     placeholder = "File name",
                     field = state.fileNameField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeFileName(it)) },
-                    error = if (state.fileNameField.isValid) null else "Invalid file name",
+                    error = if (state.fileNameField.value != null && !state.fileNameField.isValid) "Invalid file name" else null, //TODO: Fix
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                TextField(
+                    placeholder = "Api key",
+                    field = state.apiKeyField,
+                    onTextChanged = { onEvent(MainScreenEvent.ChangeApiKey(it)) },
+                    error = if (state.apiKeyField.value != null && !state.apiKeyField.isValid) "Invalid api key" else null, //TODO: Fix
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -53,7 +61,7 @@ internal fun MainScreen(
                     TextField(
                         placeholder = "Input folder",
                         field = state.inputField,
-                        error = if (state.inputField.isValid) null else "Invalid path",
+                        error = if (state.inputField.value != null && !state.inputField.isValid) "Invalid path" else null, //TODO: Fix
                         readOnly = true,
                         modifier = Modifier.weight(1f),
                     )
@@ -70,7 +78,7 @@ internal fun MainScreen(
                     TextField(
                         placeholder = "Output folder",
                         field = state.outputField,
-                        error = if (state.outputField.isValid) null else "Invalid path",
+                        error = if (state.outputField.value != null && state.outputField.isValid) "Invalid path" else null, //TODO: Fix
                         readOnly = true,
                         modifier = Modifier.weight(1f),
                     )
@@ -101,15 +109,18 @@ internal fun MainScreen(
 internal sealed interface MainScreenEvent {
     data class ChangeUrl(val url: String) : MainScreenEvent
     data class ChangeFileName(val fileName: String) : MainScreenEvent
+    data class ChangeApiKey(val apiKey: String) : MainScreenEvent
     data object OpenInputPathPicker : MainScreenEvent
     data object OpenOutputPathPicker : MainScreenEvent
     data object Generate : MainScreenEvent
     data object DismissError : MainScreenEvent
 }
 
+//TODO: Fix duplications (valid/value on fields)
 internal data class MainScreenState(
     val urlField: Field<String>,
     val fileNameField: Field<String>,
+    val apiKeyField: Field<String>,
     val inputField: Field<String>,
     val outputField: Field<String>,
     val generateError: String?,

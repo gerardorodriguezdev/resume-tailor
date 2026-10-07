@@ -20,7 +20,7 @@ internal fun TextField(
         onValueChange = onTextChanged,
         label = { Text(placeholder) },
         supportingText = { error?.let { Text(it) } },
-        isError = !field.isValid,
+        isError = field.value != null && !field.isValid,
         readOnly = readOnly,
         singleLine = true,
         modifier = modifier,
