@@ -2,6 +2,7 @@ package ui.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import ui.models.Field
 import androidx.compose.material3.TextField as MaterialTextField
 
@@ -12,13 +13,16 @@ fun TextField(
     onTextChanged: (newText: String) -> Unit = {},
     error: String? = null,
     readOnly: Boolean = false,
+    modifier: Modifier = Modifier,
 ) {
     MaterialTextField(
         value = field.value.orEmpty(),
         onValueChange = onTextChanged,
-        placeholder = { Text(placeholder) },
+        label = { Text(placeholder) },
         supportingText = { error?.let { Text(it) } },
-        isError = field.isValid,
+        isError = !field.isValid,
         readOnly = readOnly,
+        singleLine = true,
+        modifier = modifier,
     )
 }

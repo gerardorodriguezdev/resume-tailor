@@ -25,15 +25,17 @@ internal fun MainScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
-                //.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(padding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextField(
                     placeholder = "Website url",
                     field = state.urlField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeUrl(it)) },
                     error = if (state.urlField.isValid) null else "Invalid URL",
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 TextField(
@@ -41,6 +43,7 @@ internal fun MainScreen(
                     field = state.fileNameField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeFileName(it)) },
                     error = if (state.fileNameField.isValid) null else "Invalid file name",
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 Row(
@@ -52,6 +55,7 @@ internal fun MainScreen(
                         field = state.inputField,
                         error = if (state.inputField.isValid) null else "Invalid path",
                         readOnly = true,
+                        modifier = Modifier.weight(1f),
                     )
                     Button(
                         text = "Browse",
@@ -68,6 +72,7 @@ internal fun MainScreen(
                         field = state.outputField,
                         error = if (state.outputField.isValid) null else "Invalid path",
                         readOnly = true,
+                        modifier = Modifier.weight(1f),
                     )
                     Button(
                         text = "Browse",
