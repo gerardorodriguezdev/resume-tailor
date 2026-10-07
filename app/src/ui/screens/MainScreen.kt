@@ -50,14 +50,11 @@ internal fun MainScreen(
                     TextField(
                         placeholder = "Input folder",
                         field = state.inputField,
-                        onTextChanged = {},
                         error = if (state.inputField.isValid) null else "Invalid path",
                         readOnly = true,
                     )
                     Button(
                         text = "Browse",
-                        isLoading = false,
-                        isEnabled = true,
                         onClick = { onEvent(MainScreenEvent.OpenInputPathPicker) },
                     )
                 }
@@ -69,22 +66,19 @@ internal fun MainScreen(
                     TextField(
                         placeholder = "Output folder",
                         field = state.outputField,
-                        onTextChanged = {},
                         error = if (state.outputField.isValid) null else "Invalid path",
                         readOnly = true,
                     )
                     Button(
                         text = "Browse",
-                        isLoading = false,
-                        isEnabled = true,
                         onClick = { onEvent(MainScreenEvent.OpenOutputPathPicker) },
                     )
                 }
 
                 Button(
                     text = "Generate",
-                    isLoading = state.isLoading,
                     isEnabled = state.isGenerateButtonEnabled,
+                    isLoading = state.isGenerateButtonLoading,
                     onClick = { onEvent(MainScreenEvent.Generate) },
                 )
             }
@@ -101,20 +95,20 @@ internal fun MainScreen(
 
 sealed interface MainScreenEvent {
     data class ChangeUrl(val url: String) : MainScreenEvent
+    data class ChangeFileName(val fileName: String) : MainScreenEvent
     data object OpenInputPathPicker : MainScreenEvent
     data object OpenOutputPathPicker : MainScreenEvent
-    data class ChangeFileName(val fileName: String) : MainScreenEvent
     data object Generate : MainScreenEvent
     data object DismissError : MainScreenEvent
 }
 
 data class MainScreenState(
     val urlField: Field<String>,
+    val fileNameField: Field<String>,
     val inputField: Field<String>,
     val outputField: Field<String>,
-    val fileNameField: Field<String>,
-    val isLoading: Boolean,
     val error: String?,
     val isGenerateButtonEnabled: Boolean,
+    val isGenerateButtonLoading: Boolean,
 )
 

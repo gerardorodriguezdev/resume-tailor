@@ -12,9 +12,9 @@ import androidx.compose.material3.Button as MaterialButton
 @Composable
 fun Button(
     text: String,
-    isLoading: Boolean,
-    isEnabled: Boolean,
     onClick: () -> Unit,
+    isLoading: Boolean = false,
+    isEnabled: Boolean = true,
 ) {
     MaterialButton(
         onClick = onClick,

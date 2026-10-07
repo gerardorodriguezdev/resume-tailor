@@ -7,10 +7,10 @@ import androidx.compose.material3.TextField as MaterialTextField
 
 @Composable
 fun TextField(
-    placeholder: String,
-    field: Field<String>,
-    onTextChanged: (newText: String) -> Unit,
-    error: String?,
+    placeholder: String = "",
+    field: Field<String> = Field(value = null, isValid = false),
+    onTextChanged: (newText: String) -> Unit = {},
+    error: String? = null,
     readOnly: Boolean = false,
 ) {
     MaterialTextField(
@@ -18,7 +18,7 @@ fun TextField(
         onValueChange = onTextChanged,
         placeholder = { Text(placeholder) },
         supportingText = { error?.let { Text(it) } },
-        isError = error != null,
+        isError = field.isValid,
         readOnly = readOnly,
     )
 }
