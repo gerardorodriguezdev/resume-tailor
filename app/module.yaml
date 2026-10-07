@@ -3,6 +3,7 @@ product: jvm/app
 dependencies:
   - $compose.desktop.currentOs
   - $compose.material3
+  - $compose.hotReload.runtimeApi
 
 settings:
   compose: enabled
