@@ -17,6 +17,8 @@
 - One test class: `./kotlin test -m generator --include-classes 'ResumeGeneratorTest'`
 - One test method: `./kotlin test --include-test '<FQN with package and class>'`
 - Run CLI: `./kotlin run -m cli -- --website=<url> [--input --output --filename --apikey --verbose]`
+- Run GUI: `./kotlin run -m app`; hot reload: `./kotlin run -m app --compose-hot-reload-mode` (auto-reload on save only
+  works via the IDE's "Run with Compose Hot Reload"; the CLI does not watch files)
 - List modules/checks: `./kotlin show modules`, `./kotlin show checks`
 
 ## Pipeline (generator)
