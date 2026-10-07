@@ -30,10 +30,10 @@ sealed interface MainScreenEvent {
 }
 
 data class MainScreenState(
-    val urlField: Field<String?>,
-    val inputField: Field<String?>,
-    val outputField: Field<String?>,
-    val fileNameField: Field<String?>,
+    val urlField: Field<String>,
+    val inputField: Field<String>,
+    val outputField: Field<String>,
+    val fileNameField: Field<String>,
     val isLoading: Boolean,
     val error: String?,
     val isGenerateButtonEnabled: Boolean,
