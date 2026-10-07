@@ -5,7 +5,9 @@ fun main() {
     systemSetup()
 
     singleWindowApplication(title = "Resume Tailor") {
-        MainScreen()
+        MainScreen(
+            onEvent = { event -> }
+        )
     }
 }
 

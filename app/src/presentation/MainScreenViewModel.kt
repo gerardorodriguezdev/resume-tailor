@@ -1,0 +1,3 @@
+package presentation
+
+internal class MainScreenViewModel
