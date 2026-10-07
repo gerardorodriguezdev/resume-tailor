@@ -89,9 +89,9 @@ internal fun MainScreen(
             }
         }
 
-        LaunchedEffect(state.error) {
-            if (state.error != null) {
-                snackbarHostState.showSnackbar(state.error)
+        LaunchedEffect(state.generateError) {
+            if (state.generateError != null) {
+                snackbarHostState.showSnackbar(state.generateError)
                 onEvent(MainScreenEvent.DismissError)
             }
         }
@@ -112,7 +112,7 @@ internal data class MainScreenState(
     val fileNameField: Field<String>,
     val inputField: Field<String>,
     val outputField: Field<String>,
-    val error: String?,
+    val generateError: String?,
     val isGenerateButtonEnabled: Boolean,
     val isGenerateButtonLoading: Boolean,
 )
