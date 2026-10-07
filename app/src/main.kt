@@ -5,7 +5,7 @@ fun main() {
     systemSetup()
 
     singleWindowApplication(title = "Resume Tailor") {
-        MainScreen(window = window)
+        MainScreen()
     }
 }
 
