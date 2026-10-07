@@ -1,13 +1,10 @@
 import androidx.compose.ui.window.singleWindowApplication
-import ui.screens.MainScreen
 
 fun main() {
     systemSetup()
 
     singleWindowApplication(title = "Resume Tailor") {
-        MainScreen(
-            onEvent = { event -> }
-        )
+        
     }
 }
 

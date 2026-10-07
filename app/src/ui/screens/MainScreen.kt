@@ -11,6 +11,7 @@ import ui.models.Field
 @Composable
 internal fun MainScreen(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
+    state: MainScreenState,
     onEvent: (MainScreenEvent) -> Unit,
 ) {
     MaterialTheme(colors = if (isDarkTheme) darkColors() else lightColors()) {
