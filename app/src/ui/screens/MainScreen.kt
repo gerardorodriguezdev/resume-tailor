@@ -98,7 +98,7 @@ internal fun MainScreen(
     }
 }
 
-sealed interface MainScreenEvent {
+internal sealed interface MainScreenEvent {
     data class ChangeUrl(val url: String) : MainScreenEvent
     data class ChangeFileName(val fileName: String) : MainScreenEvent
     data object OpenInputPathPicker : MainScreenEvent
@@ -107,7 +107,7 @@ sealed interface MainScreenEvent {
     data object DismissError : MainScreenEvent
 }
 
-data class MainScreenState(
+internal data class MainScreenState(
     val urlField: Field<String>,
     val fileNameField: Field<String>,
     val inputField: Field<String>,

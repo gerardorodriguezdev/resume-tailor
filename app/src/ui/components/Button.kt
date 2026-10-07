@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Button as MaterialButton
 
 @Composable
-fun Button(
+internal fun Button(
     text: String,
     onClick: () -> Unit,
     isLoading: Boolean = false,

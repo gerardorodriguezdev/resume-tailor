@@ -7,7 +7,7 @@ import ui.models.Field
 import androidx.compose.material3.TextField as MaterialTextField
 
 @Composable
-fun TextField(
+internal fun TextField(
     placeholder: String = "",
     field: Field<String> = Field(value = null, isValid = false),
     onTextChanged: (newText: String) -> Unit = {},
