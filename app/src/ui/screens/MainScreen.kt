@@ -127,9 +127,11 @@ internal data class MainScreenState(
     val inputField: Field<String>,
     val outputField: Field<String>,
     val notificationMessage: NotificationMessage?,
-    val isGenerateButtonEnabled: Boolean,
     val isGenerateButtonLoading: Boolean,
 ) {
+    val isGenerateButtonEnabled: Boolean =
+        urlField.isValid && fileNameField.isValid && apiKeyField.isValid && inputField.isValid && outputField.isValid && !isGenerateButtonLoading
+
     data class NotificationMessage(
         val message: String,
         val isError: Boolean,

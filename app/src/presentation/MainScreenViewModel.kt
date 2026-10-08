@@ -121,15 +121,8 @@ internal class MainScreenViewModel(
 
     //TODO: Fix
     private fun reduce(transform: (MainScreenState) -> MainScreenState) {
-        state.update { current ->
-            val updated = transform(current)
-            updated.copy(isGenerateButtonEnabled = updated.isGenerateButtonEnabled())
-        }
+        state.update { current -> transform(current) }
     }
-
-    //TODO: Fix
-    private fun MainScreenState.isGenerateButtonEnabled(): Boolean =
-        urlField.isValid && fileNameField.isValid && apiKeyField.isValid && inputField.isValid && outputField.isValid && !isGenerateButtonLoading
 
     //TODO: Update
     private fun isValidUrl(url: String): Boolean = false
@@ -150,8 +143,6 @@ internal class MainScreenViewModel(
     }
 
     private companion object {
-        const val GENERATE_ERROR_MESSAGE = "Failed to generate resume"
-
         val initialState = MainScreenState(
             urlField = Field(value = null, isValid = false),
             fileNameField = Field(value = null, isValid = false),
@@ -159,7 +150,6 @@ internal class MainScreenViewModel(
             inputField = Field(value = null, isValid = false),
             outputField = Field(value = null, isValid = false),
             notificationMessage = null,
-            isGenerateButtonEnabled = false,
             isGenerateButtonLoading = false,
         )
     }
