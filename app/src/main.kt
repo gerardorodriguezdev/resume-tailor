@@ -17,7 +17,7 @@ fun main() {
     val inputValidator = DefaultInputValidator()
     val logger = KotlinLogger(
         delegate = KotlinLogging.logger("DefaultLogger"),
-        verbose = true, //TODO: Redo
+        verbose = false,
     )
 
     singleWindowApplication(title = "Resume Tailor") {
@@ -25,8 +25,8 @@ fun main() {
             MainScreenViewModel(
                 pathPicker = pathPicker,
                 dispatchersProvider = dispatchersProvider,
-                logger = logger,
                 inputValidator = inputValidator,
+                resumeGeneratorProvider = { apiKey -> ResumeGenerator.build(apiKey, logger) }
             )
         }
         val state by viewModel.state.collectAsState()

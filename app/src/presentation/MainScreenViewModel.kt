@@ -1,7 +1,6 @@
 package presentation
 
 import InputValidator
-import Logger
 import ResumeGenerator
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -22,8 +21,8 @@ import kotlin.coroutines.cancellation.CancellationException
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
     private val dispatchersProvider: DispatchersProvider,
-    private val logger: Logger,
     private val inputValidator: InputValidator,
+    private val resumeGeneratorProvider: (apiKey: String) -> ResumeGenerator,
 ) : ViewModel() {
     private val asyncScope = CoroutineScope(dispatchersProvider.io.limitedParallelism(1))
     private var generateJob: Job? = null
@@ -107,10 +106,7 @@ internal class MainScreenViewModel(
     }
 
     private suspend fun generate(apiKey: String, inputPath: String, outputPath: String, url: String, fileName: String) {
-        val resumeGenerator = ResumeGenerator.build(
-            apiKey = apiKey,
-            logger = logger,
-        )
+        val resumeGenerator = resumeGeneratorProvider(apiKey)
         resumeGenerator.generate(
             inputPath = inputPath,
             outputPath = outputPath,
