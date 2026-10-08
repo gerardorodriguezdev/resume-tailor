@@ -3,8 +3,11 @@ import java.net.InetAddress
 import java.net.URI
 
 fun isValidApiKey(apiKey: String): Boolean = API_KEY_REGEX.matches(apiKey)
+private val API_KEY_REGEX = Regex("^[A-Za-z0-9_-]{1,128}$")
 
 fun isValidFileName(fileName: String): Boolean = FILE_NAME_REGEX.matches(fileName)
+
+private val FILE_NAME_REGEX = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 fun isValidPath(path: String): Boolean = path.isNotEmpty() && File(path).isDirectory
 
@@ -43,7 +46,3 @@ private val UNSAFE_CONTENT = Regex(
             "\\u200B-\\u200F\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]",
     setOf(RegexOption.IGNORE_CASE),
 )
-
-private val API_KEY_REGEX = Regex("^[A-Za-z0-9_-]{1,128}$")
-
-private val FILE_NAME_REGEX = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
