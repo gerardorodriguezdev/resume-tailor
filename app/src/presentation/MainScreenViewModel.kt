@@ -64,13 +64,13 @@ internal class MainScreenViewModel(
     }
 
     private fun openInputPathPicker() {
-        val path = pathPicker.pick() ?: return
+        val path = pathPicker.pick(state.value.inputField.value) ?: return
         val isValid = inputValidator.isValidPath(path)
         state.update { state -> state.copy(inputField = Field(value = path, isValid = isValid)) }
     }
 
     private fun openOutputPathPicker() {
-        val path = pathPicker.pick() ?: return
+        val path = pathPicker.pick(state.value.outputField.value) ?: return
         val isValid = inputValidator.isValidPath(path)
         state.update { state -> state.copy(outputField = Field(value = path, isValid = isValid)) }
     }

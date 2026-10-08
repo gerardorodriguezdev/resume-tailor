@@ -70,7 +70,6 @@ internal fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                //TODO: Start from latest selected
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
