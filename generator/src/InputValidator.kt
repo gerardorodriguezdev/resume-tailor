@@ -42,7 +42,7 @@ class DefaultInputValidator : InputValidator {
     }
 
     private companion object {
-        val API_KEY_REGEX = Regex("^[A-Za-z0-9_-]{1,128}$")
+        val API_KEY_REGEX = Regex("^sk-[A-Fa-f0-9]{32}$")
         val FILE_NAME_REGEX = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
     }
 }

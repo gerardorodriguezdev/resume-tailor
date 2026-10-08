@@ -113,7 +113,7 @@ class ArgumentsParserTest {
 
     private companion object {
         const val VALID_WEBSITE = "https://example.com"
-        const val VALID_API_KEY = "sk-abc123_XYZ-456"
+        const val VALID_API_KEY = "sk-" + "0123456789abcdef0123456789abcdef"
         const val VALID_FILE_NAME = "My_Resume-v2"
 
         @JvmStatic

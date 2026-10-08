@@ -68,21 +68,23 @@ class InputValidatorTest {
     private companion object {
         @JvmStatic
         fun validApiKeys(): List<Arguments> = listOf(
-            Arguments.of("single character", "a"),
-            Arguments.of("letters and digits", "abc123"),
-            Arguments.of("letters, digits and symbols", "sk-abc123_XYZ-456"),
-            Arguments.of("underscores and hyphens", "___---___"),
-            Arguments.of("128 characters", "a".repeat(128)),
+            Arguments.of("deepseek key", "sk-" + "0123456789abcdef0123456789abcdef"),
+            Arguments.of("uppercase hex", "sk-${"A".repeat(32)}"),
+            Arguments.of("mixed case hex", "sk-${"aBcDeF".repeat(5)}aB"),
         )
 
         @JvmStatic
         fun invalidApiKeys(): List<Arguments> = listOf(
             Arguments.of("empty string", ""),
             Arguments.of("blank string", " "),
-            Arguments.of("dot", "key.with.dot"),
+            Arguments.of("missing prefix", "fedcba9876543210fedcba9876543210"),
+            Arguments.of("uppercase prefix", "SK-0123456789abcdef0123456789abcdef"),
+            Arguments.of("short hex", "sk-123427f3ee0a43622e38e051a4aa88"),
+            Arguments.of("long hex", "sk-" + "0123456789abcdef0123456789abcdefaa"),
+            Arguments.of("non-hex characters", "sk-g4f927f3ee0a4361be38e051a4ed88f1"),
+            Arguments.of("underscore separators", "sk-abc123_XYZ-456"),
             Arguments.of("spaces and symbols", "sk-abc123; rm -rf /"),
-            Arguments.of("special characters", "key!@#"),
-            Arguments.of("129 characters", "a".repeat(129)),
+            Arguments.of("dot", "key.with.dot"),
         )
 
         @JvmStatic
