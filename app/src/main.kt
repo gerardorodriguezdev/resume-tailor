@@ -2,9 +2,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.singleWindowApplication
 import androidx.lifecycle.viewmodel.compose.viewModel
-import presentation.AwtPathPicker
 import presentation.MainScreenViewModel
 import ui.screens.MainScreen
+import utils.AwtPathPicker
 import utils.DefaultDispatchersProvider
 
 fun main() {

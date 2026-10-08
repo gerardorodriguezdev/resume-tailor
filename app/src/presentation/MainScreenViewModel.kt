@@ -12,16 +12,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ui.models.Field
 import ui.screens.MainScreenEvent
 import ui.screens.MainScreenState
 import utils.DispatchersProvider
 import utils.NoOpLogger
+import utils.PathPicker
 import kotlin.coroutines.cancellation.CancellationException
 
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
-    dispatchersProvider: DispatchersProvider,
+    private val dispatchersProvider: DispatchersProvider,
 ) : ViewModel() {
     private val asyncScope = CoroutineScope(dispatchersProvider.io.limitedParallelism(1))
     private var generateJob: Job? = null
@@ -90,6 +92,10 @@ internal class MainScreenViewModel(
                     url = currentState.urlField.value!!,
                     fileName = currentState.fileNameField.value!!,
                 )
+
+                withContext(dispatchersProvider.main) {
+                    notifySuccess()
+                }
             }
         } catch (error: CancellationException) {
             throw error
@@ -115,6 +121,17 @@ internal class MainScreenViewModel(
 
     private fun updateLoading(isLoading: Boolean) {
         state.update { state -> state.copy(isGenerateButtonLoading = isLoading) }
+    }
+
+    private fun notifySuccess() {
+        state.update { state ->
+            state.copy(
+                notificationMessage = MainScreenState.NotificationMessage(
+                    message = "Generation successful",
+                    isError = false
+                )
+            )
+        }
     }
 
     private fun notifyError(error: String?) {

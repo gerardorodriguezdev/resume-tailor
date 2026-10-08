@@ -38,6 +38,7 @@ internal fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
+                //TODO: How will look file
                 TextField(
                     placeholder = "File name",
                     field = state.fileNameField,
@@ -54,6 +55,7 @@ internal fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
+                //TODO: Start from latest selected
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
