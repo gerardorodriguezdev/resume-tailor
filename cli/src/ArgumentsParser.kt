@@ -1,5 +1,3 @@
-import java.io.File
-
 internal class ArgumentsParser {
 
     fun parse(args: Array<String>): ParsingResult {
@@ -46,14 +44,6 @@ internal class ArgumentsParser {
             arg.substring(0, separator) to arg.substring(separator + 1)
         }
 
-    private fun isValidApiKey(apiKey: String): Boolean = API_KEY_REGEX.matches(apiKey)
-
-    private fun isValidFileName(fileName: String): Boolean = FILE_NAME_REGEX.matches(fileName)
-
-    private fun isValidPath(path: String): Boolean = path.isNotEmpty() && File(path).isDirectory
-
-    private fun isValidUrl(url: String): Boolean = isSafePublicUrl(url)
-
     sealed interface ParsingResult {
         data class Arguments(
             val inputPath: String?,
@@ -75,8 +65,6 @@ internal class ArgumentsParser {
         const val API_KEY_ARG = "--apikey"
         const val VERBOSE_ARG = "--verbose"
         const val HELP_ARG = "--help"
-        val API_KEY_REGEX = Regex("^[A-Za-z0-9_-]{1,128}$")
-        val FILE_NAME_REGEX = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
         const val HELP_TEXT = """
             Usage: resume-tailor --website=<url> [options]

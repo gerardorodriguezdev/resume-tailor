@@ -3,6 +3,10 @@ package presentation
 import ResumeGenerator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import isValidApiKey
+import isValidFileName
+import isValidPath
+import isValidUrl
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -123,18 +127,6 @@ internal class MainScreenViewModel(
     private fun reduce(transform: (MainScreenState) -> MainScreenState) {
         state.update { current -> transform(current) }
     }
-
-    //TODO: Update
-    private fun isValidUrl(url: String): Boolean = false
-
-    //TODO: Update
-    private fun isValidFileName(fileName: String): Boolean = false
-
-    //TODO: Update
-    private fun isValidApiKey(apiKey: String): Boolean = false
-
-    //TODO: Update
-    private fun isValidPath(path: String): Boolean = false
 
     override fun onCleared() {
         super.onCleared()

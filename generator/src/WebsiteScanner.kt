@@ -28,7 +28,7 @@ internal class PlaywrightWebsiteScanner : WebsiteScanner {
 
     private fun validateRoute(route: Route) {
         val request = route.request()
-        if (request.isNavigationRequest || isSafePublicUrl(request.url())) {
+        if (request.isNavigationRequest || isValidUrl(request.url())) {
             route.resume()
         } else {
             route.abort()
