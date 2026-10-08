@@ -13,7 +13,6 @@ import ui.components.Button
 import ui.components.TextField
 import ui.models.Field
 
-//TODO: Test
 @Composable
 internal fun MainScreen(
     state: MainScreenState,
