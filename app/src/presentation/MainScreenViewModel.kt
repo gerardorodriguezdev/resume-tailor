@@ -17,7 +17,6 @@ import utils.DispatchersProvider
 import utils.PathPicker
 import kotlin.coroutines.cancellation.CancellationException
 
-//TODO: Solve loading state
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
     private val dispatchersProvider: DispatchersProvider,
@@ -81,9 +80,9 @@ internal class MainScreenViewModel(
 
         updateLoading(true)
 
-        try {
-            val currentState = state.value
-            generateJob = asyncScope.launch {
+        val currentState = state.value
+        generateJob = asyncScope.launch {
+            try {
                 generate(
                     apiKey = currentState.apiKeyField.value!!,
                     inputPath = currentState.inputField.value!!,
@@ -95,13 +94,13 @@ internal class MainScreenViewModel(
                 withContext(dispatchersProvider.main) {
                     notifySuccess()
                 }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                notifyError(error.message)
+            } finally {
+                updateLoading(false)
             }
-        } catch (error: CancellationException) {
-            throw error
-        } catch (error: Exception) {
-            notifyError(error.message)
-        } finally {
-            updateLoading(false)
         }
     }
 
@@ -154,7 +153,7 @@ internal class MainScreenViewModel(
     private companion object {
         val initialState = MainScreenState(
             urlField = Field(value = null, isValid = false),
-            fileNameField = Field(value = null, isValid = false),
+            fileNameField = Field(value = "Resume", isValid = false),
             apiKeyField = Field(value = null, isValid = false),
             inputField = Field(value = null, isValid = false),
             outputField = Field(value = null, isValid = false),
