@@ -97,10 +97,10 @@ internal fun MainScreen(
             }
         }
 
-        LaunchedEffect(state.generateError) {
-            if (state.generateError != null) {
-                snackbarHostState.showSnackbar(state.generateError)
-                onEvent(MainScreenEvent.DismissError)
+        LaunchedEffect(state.notificationMessage) {
+            if (state.notificationMessage != null) {
+                snackbarHostState.showSnackbar(state.notificationMessage.message)
+                onEvent(MainScreenEvent.DismissNotification)
             }
         }
     }
@@ -116,7 +116,7 @@ internal sealed interface MainScreenEvent {
     data object OpenInputPathPicker : MainScreenEvent
     data object OpenOutputPathPicker : MainScreenEvent
     data object Generate : MainScreenEvent
-    data object DismissError : MainScreenEvent
+    data object DismissNotification : MainScreenEvent
 }
 
 //TODO: Fix duplications (valid/value on fields)
@@ -126,8 +126,13 @@ internal data class MainScreenState(
     val apiKeyField: Field<String>,
     val inputField: Field<String>,
     val outputField: Field<String>,
-    val generateError: String?,
+    val notificationMessage: NotificationMessage?,
     val isGenerateButtonEnabled: Boolean,
     val isGenerateButtonLoading: Boolean,
-)
+) {
+    data class NotificationMessage(
+        val message: String,
+        val isError: Boolean,
+    )
+}
 

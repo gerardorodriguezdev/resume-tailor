@@ -33,7 +33,7 @@ internal class MainScreenViewModel(
             is MainScreenEvent.OpenInputPathPicker -> openInputPathPicker()
             is MainScreenEvent.OpenOutputPathPicker -> openOutputPathPicker()
             is MainScreenEvent.Generate -> generate()
-            is MainScreenEvent.DismissError -> dismissError()
+            is MainScreenEvent.DismissNotification -> dismissError()
         }
     }
 
@@ -92,7 +92,7 @@ internal class MainScreenViewModel(
                 }
             } catch (error: Exception) {
                 if (error !is CancellationException) {
-                    generateError()
+                    notifyError(error = error.message ?: "Unknown error")
                 }
             } finally {
                 setLoading(false)
@@ -104,13 +104,19 @@ internal class MainScreenViewModel(
         reduce { state -> state.copy(isGenerateButtonLoading = isLoading) }
     }
 
-    //TODO: Update other errors
-    private fun generateError() {
-        reduce { state -> state.copy(generateError = GENERATE_ERROR_MESSAGE) }
+    private fun notifyError(error: String) {
+        reduce { state ->
+            state.copy(
+                notificationMessage = MainScreenState.NotificationMessage(
+                    message = error,
+                    isError = true
+                )
+            )
+        }
     }
 
     private fun dismissError() {
-        reduce { state -> state.copy(generateError = null) }
+        reduce { state -> state.copy(notificationMessage = null) }
     }
 
     //TODO: Fix
@@ -152,7 +158,7 @@ internal class MainScreenViewModel(
             apiKeyField = Field(value = null, isValid = false),
             inputField = Field(value = null, isValid = false),
             outputField = Field(value = null, isValid = false),
-            generateError = null,
+            notificationMessage = null,
             isGenerateButtonEnabled = false,
             isGenerateButtonLoading = false,
         )
