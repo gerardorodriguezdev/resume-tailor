@@ -34,7 +34,7 @@ internal fun MainScreen(
                     placeholder = "Website url",
                     field = state.urlField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeUrl(it)) },
-                    error = if (state.urlField.value != null && !state.urlField.isValid) "Invalid URL" else null, //TODO: Fix
+                    supportingText = if (state.urlField.value != null && !state.urlField.isValid) "Invalid URL" else null, //TODO: Fix
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -42,7 +42,7 @@ internal fun MainScreen(
                     placeholder = "File name",
                     field = state.fileNameField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeFileName(it)) },
-                    error = if (state.fileNameField.value != null && !state.fileNameField.isValid) "Invalid file name" else null, //TODO: Fix
+                    supportingText = if (state.fileNameField.value != null && !state.fileNameField.isValid) "Invalid file name" else null, //TODO: Fix
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -50,7 +50,7 @@ internal fun MainScreen(
                     placeholder = "Api key",
                     field = state.apiKeyField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeApiKey(it)) },
-                    error = if (state.apiKeyField.value != null && !state.apiKeyField.isValid) "Invalid api key" else null, //TODO: Fix
+                    supportingText = if (state.apiKeyField.value != null && !state.apiKeyField.isValid) "Invalid api key" else null, //TODO: Fix
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -61,7 +61,7 @@ internal fun MainScreen(
                     TextField(
                         placeholder = "Input folder",
                         field = state.inputField,
-                        error = if (state.inputField.value != null && !state.inputField.isValid) "Invalid path" else null, //TODO: Fix
+                        supportingText = if (state.inputField.value != null && !state.inputField.isValid) "Invalid path" else null, //TODO: Fix
                         readOnly = true,
                         modifier = Modifier.weight(1f),
                     )
@@ -78,7 +78,7 @@ internal fun MainScreen(
                     TextField(
                         placeholder = "Output folder",
                         field = state.outputField,
-                        error = if (state.outputField.value != null && state.outputField.isValid) "Invalid path" else null, //TODO: Fix
+                        supportingText = if (state.outputField.value != null && state.outputField.isValid) "Invalid path" else null, //TODO: Fix
                         readOnly = true,
                         modifier = Modifier.weight(1f),
                     )

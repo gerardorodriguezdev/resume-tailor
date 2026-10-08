@@ -11,7 +11,7 @@ internal fun TextField(
     placeholder: String = "",
     field: Field<String> = Field(value = null, isValid = false),
     onTextChanged: (newText: String) -> Unit = {},
-    error: String? = null,
+    supportingText: String? = null,
     readOnly: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
@@ -19,7 +19,7 @@ internal fun TextField(
         value = field.value.orEmpty(),
         onValueChange = onTextChanged,
         label = { Text(placeholder) },
-        supportingText = { error?.let { Text(it) } },
+        supportingText = { supportingText?.let { Text(it) } },
         isError = field.value != null && !field.isValid,
         readOnly = readOnly,
         singleLine = true,
