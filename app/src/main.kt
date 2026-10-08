@@ -8,7 +8,6 @@ import ui.screens.MainScreen
 import utils.AwtPathPicker
 import utils.DefaultDispatchersProvider
 
-//TODO: Keep key/input/output
 fun main() {
     systemSetup()
 
