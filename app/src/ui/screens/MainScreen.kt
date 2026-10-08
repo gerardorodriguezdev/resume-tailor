@@ -119,7 +119,6 @@ internal sealed interface MainScreenEvent {
     data object DismissNotification : MainScreenEvent
 }
 
-//TODO: Fix duplications (valid/value on fields)
 internal data class MainScreenState(
     val urlField: Field<String>,
     val fileNameField: Field<String>,

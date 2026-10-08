@@ -22,8 +22,9 @@ import kotlin.coroutines.cancellation.CancellationException
 
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
-    private val dispatchersProvider: DispatchersProvider,
+    dispatchersProvider: DispatchersProvider,
 ) : ViewModel() {
+    private val asyncDispatcher = dispatchersProvider.io.limitedParallelism(1)
     private var generateJob: Job? = null
 
     val state: StateFlow<MainScreenState>
@@ -41,46 +42,48 @@ internal class MainScreenViewModel(
         }
     }
 
-    private fun changeUrl(url: String) =
-        reduce { state ->
-            state.copy(urlField = Field(value = url, isValid = isValidUrl(url)))
-        }
+    private fun changeUrl(url: String) {
+        val isValid = isValidUrl(url)
+        state.update { state -> state.copy(urlField = Field(value = url, isValid = isValid)) }
+    }
 
-    private fun changeFileName(fileName: String) =
-        reduce { state ->
-            state.copy(fileNameField = Field(value = fileName, isValid = isValidFileName(fileName)))
+    private fun changeFileName(fileName: String) {
+        val isValid = isValidFileName(fileName)
+        state.update { state ->
+            state.copy(
+                fileNameField = Field(
+                    value = fileName,
+                    isValid = isValid
+                )
+            )
         }
+    }
 
-    private fun changeApiKey(apiKey: String) =
-        reduce { state ->
-            state.copy(apiKeyField = Field(value = apiKey, isValid = isValidApiKey(apiKey)))
-        }
+    private fun changeApiKey(apiKey: String) {
+        val isValid = isValidApiKey(apiKey)
+        state.update { state -> state.copy(apiKeyField = Field(value = apiKey, isValid = isValid)) }
+    }
 
-    //TODO Review
     private fun openInputPathPicker() {
-        viewModelScope.launch {
-            val path = pathPicker.pick() ?: return@launch
-            reduce { state -> state.copy(inputField = Field(value = path, isValid = isValidPath(path))) }
-        }
+        val path = pathPicker.pick() ?: return
+        val isValid = isValidPath(path)
+        state.update { state -> state.copy(inputField = Field(value = path, isValid = isValid)) }
     }
 
-    //TODO Review
     private fun openOutputPathPicker() {
-        viewModelScope.launch {
-            val path = pathPicker.pick() ?: return@launch
-            reduce { state -> state.copy(outputField = Field(value = path, isValid = isValidPath(path))) }
-        }
+        val path = pathPicker.pick() ?: return
+        val isValid = isValidPath(path)
+        state.update { state -> state.copy(outputField = Field(value = path, isValid = isValid)) }
     }
 
-    //TODO: Update
     private fun generate() {
         generateJob = viewModelScope.launch {
             generateJob?.cancel()
 
-            setLoading(true)
+            updateLoading(true)
 
             try {
-                generateJob = withContext(dispatchersProvider.io) {
+                generateJob = withContext(asyncDispatcher) {
                     launch {
                         val resumeGenerator = ResumeGenerator.build(
                             apiKey = state.value.apiKeyField.value!!,
@@ -99,17 +102,17 @@ internal class MainScreenViewModel(
                     notifyError(error = error.message ?: "Unknown error")
                 }
             } finally {
-                setLoading(false)
+                updateLoading(false)
             }
         }
     }
 
-    private fun setLoading(isLoading: Boolean) {
-        reduce { state -> state.copy(isGenerateButtonLoading = isLoading) }
+    private fun updateLoading(isLoading: Boolean) {
+        state.update { state -> state.copy(isGenerateButtonLoading = isLoading) }
     }
 
     private fun notifyError(error: String) {
-        reduce { state ->
+        state.update { state ->
             state.copy(
                 notificationMessage = MainScreenState.NotificationMessage(
                     message = error,
@@ -120,12 +123,7 @@ internal class MainScreenViewModel(
     }
 
     private fun dismissError() {
-        reduce { state -> state.copy(notificationMessage = null) }
-    }
-
-    //TODO: Fix
-    private fun reduce(transform: (MainScreenState) -> MainScreenState) {
-        state.update { current -> transform(current) }
+        state.update { state -> state.copy(notificationMessage = null) }
     }
 
     override fun onCleared() {
