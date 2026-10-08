@@ -22,7 +22,18 @@ internal fun MainScreen(
 ) {
     MaterialTheme(colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()) {
         val snackbarHostState = remember { SnackbarHostState() }
-        Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(snackbarHostState) { snackbarData ->
+                    val isError = state.notificationMessage?.isError == true
+                    Snackbar(
+                        snackbarData = snackbarData,
+                        containerColor = if (isError) MaterialTheme.colorScheme.error else SnackbarDefaults.color,
+                        contentColor = if (isError) MaterialTheme.colorScheme.onError else SnackbarDefaults.contentColor,
+                    )
+                }
+            }
+        ) { padding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -55,6 +66,7 @@ internal fun MainScreen(
                     field = state.apiKeyField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeApiKey(it)) },
                     supportingText = state.apiKeyField.supportingText(invalidText = "Invalid api key"),
+                    isPassword = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
