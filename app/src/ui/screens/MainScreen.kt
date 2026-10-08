@@ -107,7 +107,11 @@ internal fun MainScreen(
 }
 
 private fun Field<String>.supportingText(emptyText: String? = null, invalidText: String? = null): String? =
-    if (value == null) emptyText else invalidText
+    when {
+        value == null -> emptyText
+        !isValid -> invalidText
+        else -> null
+    }
 
 internal sealed interface MainScreenEvent {
     data class ChangeUrl(val url: String) : MainScreenEvent

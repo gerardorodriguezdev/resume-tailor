@@ -2,17 +2,16 @@ package presentation
 
 import ResumeGenerator
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import isValidApiKey
 import isValidFileName
 import isValidPath
 import isValidUrl
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ui.models.Field
 import ui.screens.MainScreenEvent
 import ui.screens.MainScreenState
@@ -24,7 +23,7 @@ internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
     dispatchersProvider: DispatchersProvider,
 ) : ViewModel() {
-    private val asyncDispatcher = dispatchersProvider.io.limitedParallelism(1)
+    private val asyncScope = CoroutineScope(dispatchersProvider.io.limitedParallelism(1))
     private var generateJob: Job? = null
 
     val state: StateFlow<MainScreenState>
@@ -77,45 +76,52 @@ internal class MainScreenViewModel(
     }
 
     private fun generate() {
-        generateJob = viewModelScope.launch {
-            generateJob?.cancel()
+        generateJob?.cancel()
 
-            updateLoading(true)
+        updateLoading(true)
 
-            try {
-                generateJob = withContext(asyncDispatcher) {
-                    launch {
-                        val resumeGenerator = ResumeGenerator.build(
-                            apiKey = state.value.apiKeyField.value!!,
-                            logger = NoOpLogger,
-                        )
-                        resumeGenerator.generate(
-                            inputPath = state.value.inputField.value!!,
-                            outputPath = state.value.outputField.value!!,
-                            url = state.value.urlField.value!!,
-                            fileName = state.value.fileNameField.value!!,
-                        )
-                    }
-                }
-            } catch (error: Exception) {
-                if (error !is CancellationException) {
-                    notifyError(error = error.message ?: "Unknown error")
-                }
-            } finally {
-                updateLoading(false)
+        try {
+            val currentState = state.value
+            generateJob = asyncScope.launch {
+                generate(
+                    apiKey = currentState.apiKeyField.value!!,
+                    inputPath = currentState.inputField.value!!,
+                    outputPath = currentState.outputField.value!!,
+                    url = currentState.urlField.value!!,
+                    fileName = currentState.fileNameField.value!!,
+                )
             }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            notifyError(error.message)
+        } finally {
+            updateLoading(false)
         }
+    }
+
+    private suspend fun generate(apiKey: String, inputPath: String, outputPath: String, url: String, fileName: String) {
+        val resumeGenerator = ResumeGenerator.build(
+            apiKey = apiKey,
+            logger = NoOpLogger,
+        )
+        resumeGenerator.generate(
+            inputPath = inputPath,
+            outputPath = outputPath,
+            url = url,
+            fileName = fileName,
+        )
     }
 
     private fun updateLoading(isLoading: Boolean) {
         state.update { state -> state.copy(isGenerateButtonLoading = isLoading) }
     }
 
-    private fun notifyError(error: String) {
+    private fun notifyError(error: String?) {
         state.update { state ->
             state.copy(
                 notificationMessage = MainScreenState.NotificationMessage(
-                    message = error,
+                    message = error ?: "Unknown error",
                     isError = true
                 )
             )

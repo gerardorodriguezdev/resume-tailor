@@ -11,7 +11,6 @@ fun main() {
     systemSetup()
 
     val pathPicker = AwtPathPicker()
-
     val dispatchersProvider = DefaultDispatchersProvider()
 
     singleWindowApplication(title = "Resume Tailor") {
