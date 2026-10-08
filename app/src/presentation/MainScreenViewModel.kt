@@ -22,7 +22,6 @@ import utils.PathPicker
 import kotlin.coroutines.cancellation.CancellationException
 
 //TODO: Test (move dependencies)
-//TODO: Logs not working
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
     private val dispatchersProvider: DispatchersProvider,

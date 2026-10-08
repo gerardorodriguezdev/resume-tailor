@@ -5,7 +5,7 @@
         </encoder>
     </appender>
 
-    <logger name="DefaultLogger" level="INFO" additivity="false">
+    <logger name="DefaultLogger" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
