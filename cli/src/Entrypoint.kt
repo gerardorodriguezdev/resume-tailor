@@ -1,6 +1,7 @@
 import ArgumentsParser.ParsingResult
 import io.github.oshai.kotlinlogging.KotlinLogging
 
+//TODO: Test
 suspend fun main(args: Array<String>) {
     val argumentsParser = ArgumentsParser()
     when (val result = argumentsParser.parse(args)) {

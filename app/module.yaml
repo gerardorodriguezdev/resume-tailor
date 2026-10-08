@@ -8,6 +8,7 @@ dependencies:
   - $libs.kotlinx.coroutines.core
   - $libs.kotlinx.coroutines.swing
   - $libs.androidx.lifecycle.viewmodel.compose
+  - $libs.kotlin.logging
 
 settings:
   compose: enabled

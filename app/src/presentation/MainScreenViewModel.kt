@@ -1,5 +1,6 @@
 package presentation
 
+import Logger
 import ResumeGenerator
 import androidx.lifecycle.ViewModel
 import isValidApiKey
@@ -17,13 +18,15 @@ import ui.models.Field
 import ui.screens.MainScreenEvent
 import ui.screens.MainScreenState
 import utils.DispatchersProvider
-import utils.NoOpLogger
 import utils.PathPicker
 import kotlin.coroutines.cancellation.CancellationException
 
+//TODO: Test (move dependencies)
+//TODO: Logs not working
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
     private val dispatchersProvider: DispatchersProvider,
+    private val logger: Logger,
 ) : ViewModel() {
     private val asyncScope = CoroutineScope(dispatchersProvider.io.limitedParallelism(1))
     private var generateJob: Job? = null
@@ -109,7 +112,7 @@ internal class MainScreenViewModel(
     private suspend fun generate(apiKey: String, inputPath: String, outputPath: String, url: String, fileName: String) {
         val resumeGenerator = ResumeGenerator.build(
             apiKey = apiKey,
-            logger = NoOpLogger,
+            logger = logger,
         )
         resumeGenerator.generate(
             inputPath = inputPath,
