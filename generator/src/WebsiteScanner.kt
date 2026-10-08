@@ -5,7 +5,9 @@ internal interface WebsiteScanner {
     suspend fun scan(url: String): String
 }
 
-internal class PlaywrightWebsiteScanner : WebsiteScanner {
+internal class PlaywrightWebsiteScanner(
+    private val inputValidator: InputValidator,
+) : WebsiteScanner {
 
     override suspend fun scan(url: String): String =
         Playwright.create().use { playwright ->
@@ -28,7 +30,7 @@ internal class PlaywrightWebsiteScanner : WebsiteScanner {
 
     private fun validateRoute(route: Route) {
         val request = route.request()
-        if (request.isNavigationRequest || isValidUrl(request.url())) {
+        if (request.isNavigationRequest || inputValidator.isValidUrl(request.url())) {
             route.resume()
         } else {
             route.abort()

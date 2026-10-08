@@ -1,12 +1,9 @@
 package presentation
 
+import InputValidator
 import Logger
 import ResumeGenerator
 import androidx.lifecycle.ViewModel
-import isValidApiKey
-import isValidFileName
-import isValidPath
-import isValidUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +18,12 @@ import utils.DispatchersProvider
 import utils.PathPicker
 import kotlin.coroutines.cancellation.CancellationException
 
-//TODO: Test (move dependencies)
+//TODO: Solve loading state
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
     private val dispatchersProvider: DispatchersProvider,
     private val logger: Logger,
+    private val inputValidator: InputValidator,
 ) : ViewModel() {
     private val asyncScope = CoroutineScope(dispatchersProvider.io.limitedParallelism(1))
     private var generateJob: Job? = null
@@ -46,12 +44,12 @@ internal class MainScreenViewModel(
     }
 
     private fun changeUrl(url: String) {
-        val isValid = isValidUrl(url)
+        val isValid = inputValidator.isValidUrl(url)
         state.update { state -> state.copy(urlField = Field(value = url, isValid = isValid)) }
     }
 
     private fun changeFileName(fileName: String) {
-        val isValid = isValidFileName(fileName)
+        val isValid = inputValidator.isValidFileName(fileName)
         state.update { state ->
             state.copy(
                 fileNameField = Field(
@@ -63,19 +61,19 @@ internal class MainScreenViewModel(
     }
 
     private fun changeApiKey(apiKey: String) {
-        val isValid = isValidApiKey(apiKey)
+        val isValid = inputValidator.isValidApiKey(apiKey)
         state.update { state -> state.copy(apiKeyField = Field(value = apiKey, isValid = isValid)) }
     }
 
     private fun openInputPathPicker() {
         val path = pathPicker.pick() ?: return
-        val isValid = isValidPath(path)
+        val isValid = inputValidator.isValidPath(path)
         state.update { state -> state.copy(inputField = Field(value = path, isValid = isValid)) }
     }
 
     private fun openOutputPathPicker() {
         val path = pathPicker.pick() ?: return
-        val isValid = isValidPath(path)
+        val isValid = inputValidator.isValidPath(path)
         state.update { state -> state.copy(outputField = Field(value = path, isValid = isValid)) }
     }
 

@@ -10,7 +10,8 @@ interface ResumeGenerator {
             val timeProvider = SystemTimeProvider()
             val uuid = Uuid.random()
             val mdFilesReader = DefaultMdFilesReader()
-            val websiteScanner = PlaywrightWebsiteScanner()
+            val inputValidator = DefaultInputValidator()
+            val websiteScanner = PlaywrightWebsiteScanner(inputValidator)
             val agent = DeepSeekAgent(
                 apiKey = apiKey,
                 clock = clock,

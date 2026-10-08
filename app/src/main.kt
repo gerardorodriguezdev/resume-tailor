@@ -14,6 +14,7 @@ fun main() {
 
     val pathPicker = AwtPathPicker()
     val dispatchersProvider = DefaultDispatchersProvider()
+    val inputValidator = DefaultInputValidator()
     val logger = KotlinLogger(
         delegate = KotlinLogging.logger("DefaultLogger"),
         verbose = true, //TODO: Redo
@@ -25,6 +26,7 @@ fun main() {
                 pathPicker = pathPicker,
                 dispatchersProvider = dispatchersProvider,
                 logger = logger,
+                inputValidator = inputValidator,
             )
         }
         val state by viewModel.state.collectAsState()

@@ -3,7 +3,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 
 //TODO: Test
 suspend fun main(args: Array<String>) {
-    val argumentsParser = ArgumentsParser()
+    val inputValidator = DefaultInputValidator()
+    val argumentsParser = ArgumentsParser(inputValidator)
     when (val result = argumentsParser.parse(args)) {
         is ParsingResult.Help -> result.printHelp()
         is ParsingResult.Arguments -> result.handleArguments()

@@ -1,5 +1,6 @@
 import com.sun.net.httpserver.HttpServer
 import kotlinx.coroutines.test.runTest
+import testing.FakeInputValidator
 import java.net.InetSocketAddress
 import kotlin.test.*
 
@@ -13,7 +14,7 @@ class WebsiteScannerTest {
 
     @Test
     fun `given valid website when scanning then returns sanitized text string`() = runTest {
-        val result = PlaywrightWebsiteScanner().scan("http://localhost:${server.address.port}/")
+        val result = PlaywrightWebsiteScanner(FakeInputValidator()).scan("http://localhost:${server.address.port}/")
 
         assertTrue("Local Test Page" in result)
         assertTrue("Local test description" in result)
@@ -31,7 +32,7 @@ class WebsiteScannerTest {
 
         try {
             assertFailsWith<IllegalArgumentException> {
-                PlaywrightWebsiteScanner().scan("http://localhost:${maliciousServer.address.port}/")
+                PlaywrightWebsiteScanner(FakeInputValidator()).scan("http://localhost:${maliciousServer.address.port}/")
             }
         } finally {
             maliciousServer.stop(0)

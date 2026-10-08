@@ -1,4 +1,6 @@
-internal class ArgumentsParser {
+internal class ArgumentsParser(
+    private val inputValidator: InputValidator,
+) {
 
     fun parse(args: Array<String>): ParsingResult {
         if (args.hasHelp) return ParsingResult.Help(HELP_TEXT)
@@ -6,19 +8,19 @@ internal class ArgumentsParser {
         val arguments = parseArguments(args.filterNot { it == VERBOSE_ARG }.toTypedArray())
 
         val inputPath = arguments[INPUT_PATH_ARG]
-        inputPath?.let { require(isValidPath(it)) { "Invalid input path" } }
+        inputPath?.let { require(inputValidator.isValidPath(it)) { "Invalid input path" } }
 
         val url = arguments[WEBSITE_ARG].orEmpty()
-        require(isValidUrl(url)) { "Invalid website url" }
+        require(inputValidator.isValidUrl(url)) { "Invalid website url" }
 
         val outputPath = arguments[OUTPUT_PATH_ARG]
-        outputPath?.let { require(isValidPath(it)) { "Invalid output path" } }
+        outputPath?.let { require(inputValidator.isValidPath(it)) { "Invalid output path" } }
 
         val fileName = arguments[FILE_NAME_ARG]
-        fileName?.let { require(isValidFileName(it)) { "Invalid file name" } }
+        fileName?.let { require(inputValidator.isValidFileName(it)) { "Invalid file name" } }
 
         val apiKey = arguments[API_KEY_ARG]
-        apiKey?.let { require(isValidApiKey(it)) { "Invalid api key" } }
+        apiKey?.let { require(inputValidator.isValidApiKey(it)) { "Invalid api key" } }
 
         val verbose = arguments[VERBOSE_ARG]?.toBooleanStrict()
 

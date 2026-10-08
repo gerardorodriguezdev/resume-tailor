@@ -39,12 +39,14 @@ internal fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                //TODO: How will look file
                 TextField(
                     placeholder = "File name",
                     field = state.fileNameField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeFileName(it)) },
-                    supportingText = state.fileNameField.supportingText(invalidText = "Invalid file name"),
+                    supportingText = state.fileNameField.supportingText(
+                        templateText = state.fileNameField.value?.let { value -> "$value.pdf" } ?: "MyFileName.pdf",
+                        invalidText = "Invalid file name"
+                    ),
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -109,11 +111,15 @@ internal fun MainScreen(
     }
 }
 
-private fun Field<String>.supportingText(emptyText: String? = null, invalidText: String? = null): String? =
+private fun Field<String>.supportingText(
+    templateText: String? = null,
+    invalidText: String? = null,
+): String? =
     when {
-        value == null -> emptyText
+        value == null -> templateText
+        isValid -> templateText
         !isValid -> invalidText
-        else -> null
+        else -> templateText
     }
 
 internal sealed interface MainScreenEvent {

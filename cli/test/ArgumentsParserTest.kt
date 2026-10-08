@@ -1,12 +1,14 @@
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import testing.FakeInputValidator
 import kotlin.io.path.createTempDirectory
 import kotlin.test.*
 
 class ArgumentsParserTest {
 
-    private val parser = ArgumentsParser()
+    private val inputValidator = FakeInputValidator()
+    private val parser = ArgumentsParser(inputValidator)
     private val inputDirectory = createTempDirectory("input-directory")
     private val outputDirectory = createTempDirectory("output-directory")
 
@@ -53,6 +55,51 @@ class ArgumentsParserTest {
         assertEquals(true, result.verbose)
     }
 
+    @Test
+    fun `given invalid website when parsing then throws IllegalArgumentException`() {
+        inputValidator.isValidUrlResult = false
+
+        assertFailsWith<IllegalArgumentException> {
+            parser.parse(arrayOf("--website=whatever"))
+        }
+    }
+
+    @Test
+    fun `given invalid input path when parsing then throws IllegalArgumentException`() {
+        inputValidator.isValidPathResult = false
+
+        assertFailsWith<IllegalArgumentException> {
+            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--input=/any/path"))
+        }
+    }
+
+    @Test
+    fun `given invalid output path when parsing then throws IllegalArgumentException`() {
+        inputValidator.isValidPathResult = false
+
+        assertFailsWith<IllegalArgumentException> {
+            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--output=/any/path"))
+        }
+    }
+
+    @Test
+    fun `given invalid file name when parsing then throws IllegalArgumentException`() {
+        inputValidator.isValidFileNameResult = false
+
+        assertFailsWith<IllegalArgumentException> {
+            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--filename=whatever"))
+        }
+    }
+
+    @Test
+    fun `given invalid api key when parsing then throws IllegalArgumentException`() {
+        inputValidator.isValidApiKeyResult = false
+
+        assertFailsWith<IllegalArgumentException> {
+            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--apikey=whatever"))
+        }
+    }
+
     @ParameterizedTest(name = "given {0} when parsing then throws IllegalArgumentException")
     @MethodSource("invalidArguments")
     fun `given invalid arguments when parsing then throws IllegalArgumentException`(
@@ -71,31 +118,6 @@ class ArgumentsParserTest {
 
         @JvmStatic
         fun invalidArguments(): List<Arguments> = listOf(
-            Arguments.of("blank website", arrayOf("--website=")),
-            Arguments.of("file scheme website", arrayOf("--website=file:///etc/passwd")),
-            Arguments.of("localhost website", arrayOf("--website=https://localhost/admin")),
-            Arguments.of("http website", arrayOf("--website=http://example.com")),
-            Arguments.of("loopback website", arrayOf("--website=https://127.0.0.1/admin")),
-            Arguments.of("javascript scheme website", arrayOf("--website=javascript:alert(1)")),
-            Arguments.of("missing input path", arrayOf("--website=$VALID_WEBSITE", "--input=/no/such/directory")),
-            Arguments.of("blank input path", arrayOf("--website=$VALID_WEBSITE", "--input=")),
-            Arguments.of("missing output path", arrayOf("--website=$VALID_WEBSITE", "--output=/no/such/directory")),
-            Arguments.of("blank output path", arrayOf("--website=$VALID_WEBSITE", "--output=")),
-            Arguments.of("blank file name", arrayOf("--website=$VALID_WEBSITE", "--filename=")),
-            Arguments.of(
-                "file name with path separator",
-                arrayOf("--website=$VALID_WEBSITE", "--filename=../Resume")
-            ),
-            Arguments.of(
-                "file name starting with dot",
-                arrayOf("--website=$VALID_WEBSITE", "--filename=.hidden")
-            ),
-            Arguments.of("blank api key", arrayOf("--website=$VALID_WEBSITE", "--apikey=")),
-            Arguments.of(
-                "api key with spaces and symbols",
-                arrayOf("--website=$VALID_WEBSITE", "--apikey=sk-abc123; rm -rf /")
-            ),
-            Arguments.of("api key with special characters", arrayOf("--website=$VALID_WEBSITE", "--apikey=key!@#")),
             Arguments.of("blank verbose", arrayOf("--website=$VALID_WEBSITE", "--verbose=")),
             Arguments.of("non-boolean verbose", arrayOf("--website=$VALID_WEBSITE", "--verbose=a")),
             Arguments.of("uppercase boolean verbose", arrayOf("--website=$VALID_WEBSITE", "--verbose=TRUE")),
