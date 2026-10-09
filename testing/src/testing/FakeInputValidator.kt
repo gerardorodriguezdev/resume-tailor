@@ -2,7 +2,7 @@ package testing
 
 import InputValidator
 
-internal class FakeInputValidator : InputValidator {
+class FakeInputValidator : InputValidator {
     var isValidApiKeyResult: Boolean = true
     var isValidFileNameResult: Boolean = true
     var isValidPathResult: Boolean = true

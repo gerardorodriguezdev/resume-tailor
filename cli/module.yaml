@@ -10,5 +10,7 @@ settings:
     mainClass: EntrypointKt
 
 test-dependencies:
+  - //testing
+  - //generator-testing
   - $libs.junit.jupiter.params
   - $libs.kotlinx.coroutines.core

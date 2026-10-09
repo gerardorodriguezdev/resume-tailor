@@ -14,5 +14,6 @@ settings:
     serialization: enabled
 
 test-dependencies:
+  - //testing
   - $libs.kotlinx.coroutines.test
   - $libs.junit.jupiter.params

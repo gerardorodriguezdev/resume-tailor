@@ -2,7 +2,7 @@ package testing
 
 import ResumeGenerator
 
-internal class FakeResumeGenerator(
+class FakeResumeGenerator(
     var error: Throwable? = null,
 ) : ResumeGenerator {
     val inputPaths: List<String>
