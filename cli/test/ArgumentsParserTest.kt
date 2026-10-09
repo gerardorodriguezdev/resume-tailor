@@ -3,6 +3,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import testing.FakeInputValidator
+import testing.TestData
 import java.nio.file.Path
 import kotlin.test.*
 
@@ -27,10 +28,10 @@ class ArgumentsParserTest {
     @Test
     fun `given valid website without input and output when parsing then succeeds`() {
         val result =
-            assertIs<ArgumentsParser.ParsingResult.Arguments>(parser.parse(arrayOf("--website=$VALID_WEBSITE")))
+            assertIs<ArgumentsParser.ParsingResult.Arguments>(parser.parse(arrayOf("--website=${TestData.WEBSITE_URL}")))
 
         assertNull(result.inputPath)
-        assertEquals(VALID_WEBSITE, result.url)
+        assertEquals(TestData.WEBSITE_URL, result.url)
         assertNull(result.outputPath)
         assertNull(result.fileName)
         assertNull(result.apiKey)
@@ -42,21 +43,21 @@ class ArgumentsParserTest {
         val result = assertIs<ArgumentsParser.ParsingResult.Arguments>(
             parser.parse(
                 arrayOf(
-                    "--website=$VALID_WEBSITE",
+                    "--website=${TestData.WEBSITE_URL}",
                     "--input=$inputDirectory",
                     "--output=$outputDirectory",
-                    "--filename=$VALID_FILE_NAME",
-                    "--apikey=$VALID_API_KEY",
+                    "--filename=${TestData.FILE_NAME_WITH_SYMBOLS}",
+                    "--apikey=${TestData.API_KEY}",
                     "--verbose=true"
                 )
             )
         )
 
         assertEquals(inputDirectory.toString(), result.inputPath)
-        assertEquals(VALID_WEBSITE, result.url)
+        assertEquals(TestData.WEBSITE_URL, result.url)
         assertEquals(outputDirectory.toString(), result.outputPath)
-        assertEquals(VALID_FILE_NAME, result.fileName)
-        assertEquals(VALID_API_KEY, result.apiKey)
+        assertEquals(TestData.FILE_NAME_WITH_SYMBOLS, result.fileName)
+        assertEquals(TestData.API_KEY, result.apiKey)
         assertEquals(true, result.verbose)
     }
 
@@ -74,7 +75,7 @@ class ArgumentsParserTest {
         inputValidator.isValidPathResult = false
 
         assertFailsWith<IllegalArgumentException> {
-            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--input=/any/path"))
+            parser.parse(arrayOf("--website=${TestData.WEBSITE_URL}", "--input=/any/path"))
         }
     }
 
@@ -83,7 +84,7 @@ class ArgumentsParserTest {
         inputValidator.isValidPathResult = false
 
         assertFailsWith<IllegalArgumentException> {
-            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--output=/any/path"))
+            parser.parse(arrayOf("--website=${TestData.WEBSITE_URL}", "--output=/any/path"))
         }
     }
 
@@ -92,7 +93,7 @@ class ArgumentsParserTest {
         inputValidator.isValidFileNameResult = false
 
         assertFailsWith<IllegalArgumentException> {
-            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--filename=whatever"))
+            parser.parse(arrayOf("--website=${TestData.WEBSITE_URL}", "--filename=whatever"))
         }
     }
 
@@ -101,7 +102,7 @@ class ArgumentsParserTest {
         inputValidator.isValidApiKeyResult = false
 
         assertFailsWith<IllegalArgumentException> {
-            parser.parse(arrayOf("--website=$VALID_WEBSITE", "--apikey=whatever"))
+            parser.parse(arrayOf("--website=${TestData.WEBSITE_URL}", "--apikey=whatever"))
         }
     }
 
@@ -117,15 +118,11 @@ class ArgumentsParserTest {
     }
 
     private companion object {
-        const val VALID_WEBSITE = "https://example.com"
-        const val VALID_API_KEY = "sk-" + "0123456789abcdef0123456789abcdef"
-        const val VALID_FILE_NAME = "My_Resume-v2"
-
         @JvmStatic
         fun invalidArguments(): List<Arguments> = listOf(
-            Arguments.of("blank verbose", arrayOf("--website=$VALID_WEBSITE", "--verbose=")),
-            Arguments.of("non-boolean verbose", arrayOf("--website=$VALID_WEBSITE", "--verbose=a")),
-            Arguments.of("uppercase boolean verbose", arrayOf("--website=$VALID_WEBSITE", "--verbose=TRUE")),
+            Arguments.of("blank verbose", arrayOf("--website=${TestData.WEBSITE_URL}", "--verbose=")),
+            Arguments.of("non-boolean verbose", arrayOf("--website=${TestData.WEBSITE_URL}", "--verbose=a")),
+            Arguments.of("uppercase boolean verbose", arrayOf("--website=${TestData.WEBSITE_URL}", "--verbose=TRUE")),
             Arguments.of("malformed argument", arrayOf("garbage")),
             Arguments.of("argument without value", arrayOf("--website")),
             Arguments.of("input argument without value", arrayOf("--input")),

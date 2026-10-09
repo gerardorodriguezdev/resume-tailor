@@ -2,7 +2,7 @@ package testing
 
 import models.Section
 
-internal object TestData {
+object TestData {
 
     const val CONTACT_EMAIL = "john.doe@example.com"
     const val CONTACT_PHONE = "+1 555 1234"
@@ -10,6 +10,28 @@ internal object TestData {
     const val CONTACT_GITHUB = "github.com/johndoe"
 
     val CONTACT_DETAILS = listOf(CONTACT_EMAIL, CONTACT_PHONE, CONTACT_LINKEDIN, CONTACT_GITHUB)
+
+    const val WEBSITE_URL = "https://example.com"
+    const val JOB_URL = "https://example.com/job"
+    const val API_KEY = "sk-" + "0123456789abcdef0123456789abcdef"
+    const val FILE_NAME = "Resume"
+    const val MY_RESUME_FILE_NAME = "MyResume"
+    const val FILE_NAME_WITH_SYMBOLS = "My_Resume-v2"
+    const val INPUT_PATH = "/tmp/input"
+    const val OUTPUT_PATH = "/tmp/output"
+
+    val PDF_BYTES = byteArrayOf(1, 2, 3, 4, 5)
+
+    val RESUME = """
+        # John Doe
+        $CONTACT_EMAIL | $CONTACT_PHONE
+
+        ## Summary
+        Senior software engineer with 10+ years of experience building scalable backend systems.
+
+        ## Skills
+        Languages: Kotlin, Java, TypeScript, Python, SQL
+    """.trimIndent()
 
     val testSections: List<Section> = listOf(
         Section.Header("$CONTACT_EMAIL | $CONTACT_PHONE | $CONTACT_LINKEDIN | $CONTACT_GITHUB"),

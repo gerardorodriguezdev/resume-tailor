@@ -14,7 +14,7 @@ class ResumeGeneratorTest {
     private val agent = FakeAgent(result = AGENT_CONTENT)
     private val sectionsParser = FakeSectionsParser(result = SECTIONS)
     private val htmlGenerator = FakeHtmlGenerator(result = HTML)
-    private val htmlToPdfConverter = FakeHtmlToPdfConverter(result = PDF)
+    private val htmlToPdfConverter = FakeHtmlToPdfConverter(result = TestData.PDF_BYTES)
     private val pdfSaver = FakePdfSaver()
     private val generator = DefaultResumeGenerator(
         logger = logger,
@@ -30,13 +30,18 @@ class ResumeGeneratorTest {
 
     @Test
     fun `given inputs when generating then calls all dependencies once with chained data`() = runTest {
-        generator.generate(inputPath = INPUT_PATH, outputPath = OUTPUT_PATH, url = URL, fileName = FILE_NAME)
+        generator.generate(
+            inputPath = INPUT_PATH,
+            outputPath = OUTPUT_PATH,
+            url = TestData.JOB_URL,
+            fileName = TestData.FILE_NAME,
+        )
 
         assertEquals(1, mdFilesReader.calls)
         assertEquals(listOf(INPUT_PATH), mdFilesReader.inputPaths)
 
         assertEquals(1, websiteScanner.calls)
-        assertEquals(listOf(URL), websiteScanner.urls)
+        assertEquals(listOf(TestData.JOB_URL), websiteScanner.urls)
 
         assertEquals(1, agent.calls)
         assertEquals(listOf(MD_CONTENT), agent.mdFilesContents)
@@ -53,8 +58,8 @@ class ResumeGeneratorTest {
 
         assertEquals(1, pdfSaver.calls)
         assertEquals(listOf(OUTPUT_PATH), pdfSaver.outputPaths)
-        assertEquals(listOf(FILE_NAME), pdfSaver.fileNames)
-        assertContentEquals(PDF, pdfSaver.pdfs.single())
+        assertEquals(listOf(TestData.FILE_NAME), pdfSaver.fileNames)
+        assertContentEquals(TestData.PDF_BYTES, pdfSaver.pdfs.single())
 
         assertEquals(TIMED_STEPS, logger.calls)
         assertEquals(TIMED_STEPS * 2, timeProvider.calls)
@@ -64,15 +69,12 @@ class ResumeGeneratorTest {
     private companion object {
         const val INPUT_PATH = "resume"
         const val OUTPUT_PATH = "output"
-        const val URL = "https://example.com/job"
-        const val FILE_NAME = "Resume"
 
         const val MD_CONTENT = "# Resume"
         const val WEBSITE_CONTENT = "<html>Job posting</html>"
         const val AGENT_CONTENT = "[{\"type\":\"header\",\"content\":\"John Doe\"}]"
         val SECTIONS = listOf(Section.Header("John Doe"))
         const val HTML = "<html><body>Resume</body></html>"
-        val PDF = byteArrayOf(1, 2, 3, 4, 5)
 
         const val TIMED_STEPS = 7
     }

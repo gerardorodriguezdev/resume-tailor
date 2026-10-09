@@ -2,6 +2,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import testing.TestData
 import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -75,7 +76,7 @@ class InputValidatorTest {
     private companion object {
         @JvmStatic
         fun validApiKeys(): List<Arguments> = listOf(
-            Arguments.of("deepseek key", "sk-" + "0123456789abcdef0123456789abcdef"),
+            Arguments.of("deepseek key", TestData.API_KEY),
             Arguments.of("uppercase hex", "sk-${"A".repeat(32)}"),
             Arguments.of("mixed case hex", "sk-${"aBcDeF".repeat(5)}aB"),
         )
@@ -84,10 +85,10 @@ class InputValidatorTest {
         fun invalidApiKeys(): List<Arguments> = listOf(
             Arguments.of("empty string", ""),
             Arguments.of("blank string", " "),
-            Arguments.of("missing prefix", "fedcba9876543210fedcba9876543210"),
-            Arguments.of("uppercase prefix", "SK-0123456789abcdef0123456789abcdef"),
-            Arguments.of("short hex", "sk-123427f3ee0a43622e38e051a4aa88"),
-            Arguments.of("long hex", "sk-" + "0123456789abcdef0123456789abcdefaa"),
+            Arguments.of("missing prefix", TestData.API_KEY.removePrefix("sk-")),
+            Arguments.of("uppercase prefix", "SK-${TestData.API_KEY.removePrefix("sk-")}"),
+            Arguments.of("short hex", TestData.API_KEY.dropLast(2)),
+            Arguments.of("long hex", TestData.API_KEY + "aa"),
             Arguments.of("non-hex characters", "sk-g4f927f3ee0a4361be38e051a4ed88f1"),
             Arguments.of("underscore separators", "sk-abc123_XYZ-456"),
             Arguments.of("spaces and symbols", "sk-abc123; rm -rf /"),
@@ -98,7 +99,7 @@ class InputValidatorTest {
         fun validFileNames(): List<Arguments> = listOf(
             Arguments.of("single character", "R"),
             Arguments.of("letters and digits", "Resume2"),
-            Arguments.of("letters, digits and symbols", "My_Resume-v2"),
+            Arguments.of("letters, digits and symbols", TestData.FILE_NAME_WITH_SYMBOLS),
             Arguments.of("extension", "resume.pdf"),
             Arguments.of("128 characters", "a".repeat(128)),
         )
@@ -125,7 +126,7 @@ class InputValidatorTest {
 
         @JvmStatic
         fun validUrls(): List<Arguments> = listOf(
-            Arguments.of("https url", "https://example.com"),
+            Arguments.of("https url", TestData.WEBSITE_URL),
             Arguments.of("uppercase scheme", "HTTPS://example.com"),
         )
 

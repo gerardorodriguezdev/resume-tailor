@@ -2,6 +2,7 @@ package ui.screens
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.v2.runComposeUiTest
+import testing.TestData
 import ui.models.Field
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,28 +17,28 @@ class MainScreenTest {
     fun `given url field input when typing then emits change url event`() = runComposeUiTest {
         setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
 
-        onNodeWithTag(MainScreenTestTags.URL_FIELD).performTextInput("https://example.com")
+        onNodeWithTag(MainScreenTestTags.URL_FIELD).performTextInput(TestData.WEBSITE_URL)
 
-        assertEquals(listOf<MainScreenEvent>(MainScreenEvent.ChangeUrl("https://example.com")), events)
+        assertEquals(listOf<MainScreenEvent>(MainScreenEvent.ChangeUrl(TestData.WEBSITE_URL)), events)
     }
 
     @Test
     fun `given file name field input when typing then emits change file name event`() = runComposeUiTest {
         setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
 
-        onNodeWithTag(MainScreenTestTags.FILE_NAME_FIELD).performTextInput("MyResume")
+        onNodeWithTag(MainScreenTestTags.FILE_NAME_FIELD).performTextInput(TestData.MY_RESUME_FILE_NAME)
 
-        assertEquals(listOf<MainScreenEvent>(MainScreenEvent.ChangeFileName("MyResume")), events)
+        assertEquals(listOf<MainScreenEvent>(MainScreenEvent.ChangeFileName(TestData.MY_RESUME_FILE_NAME)), events)
     }
 
     @Test
     fun `given api key field input when typing then emits change api key event`() = runComposeUiTest {
         setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
 
-        onNodeWithTag(MainScreenTestTags.API_KEY_FIELD).performTextInput("sk-" + "0123456789abcdef0123456789abcdef")
+        onNodeWithTag(MainScreenTestTags.API_KEY_FIELD).performTextInput(TestData.API_KEY)
 
         assertEquals(
-            listOf<MainScreenEvent>(MainScreenEvent.ChangeApiKey("sk-" + "0123456789abcdef0123456789abcdef")),
+            listOf<MainScreenEvent>(MainScreenEvent.ChangeApiKey(TestData.API_KEY)),
             events
         )
     }
@@ -101,16 +102,16 @@ class MainScreenTest {
 
         val expectedTexts = listOf(
             "Website url",
-            "https://example.com/job",
+            TestData.JOB_URL,
             "File name",
-            "MyResume",
-            "MyResume.pdf",
+            TestData.MY_RESUME_FILE_NAME,
+            "${TestData.MY_RESUME_FILE_NAME}.pdf",
             "Api key",
             "Show",
             "Input folder",
-            INPUT_PATH,
+            TestData.INPUT_PATH,
             "Output folder",
-            OUTPUT_PATH,
+            TestData.OUTPUT_PATH,
             "Browse",
             "Generate",
         )
@@ -121,9 +122,6 @@ class MainScreenTest {
     }
 
     private companion object {
-        const val INPUT_PATH = "/tmp/input"
-        const val OUTPUT_PATH = "/tmp/output"
-
         val emptyState = MainScreenState(
             urlField = Field(value = null, isValid = false),
             fileNameField = Field(value = null, isValid = false),
@@ -135,11 +133,11 @@ class MainScreenTest {
         )
 
         val completeState = MainScreenState(
-            urlField = Field(value = "https://example.com/job", isValid = true),
-            fileNameField = Field(value = "MyResume", isValid = true),
-            apiKeyField = Field(value = "sk-" + "0123456789abcdef0123456789abcdef", isValid = true),
-            inputField = Field(value = INPUT_PATH, isValid = true),
-            outputField = Field(value = OUTPUT_PATH, isValid = true),
+            urlField = Field(value = TestData.JOB_URL, isValid = true),
+            fileNameField = Field(value = TestData.MY_RESUME_FILE_NAME, isValid = true),
+            apiKeyField = Field(value = TestData.API_KEY, isValid = true),
+            inputField = Field(value = TestData.INPUT_PATH, isValid = true),
+            outputField = Field(value = TestData.OUTPUT_PATH, isValid = true),
             notificationMessage = null,
             isGenerateButtonLoading = false,
         )

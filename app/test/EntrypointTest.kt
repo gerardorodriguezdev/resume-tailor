@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.io.TempDir
 import testing.FakePathPicker
+import testing.TestData
 import ui.screens.MainScreenTestTags
 import java.io.File
 import java.nio.file.Path
@@ -28,15 +29,15 @@ class EntrypointTest {
     @Test
     @Timeout(value = 180, unit = TimeUnit.SECONDS)
     fun `given complete inputs when generating then saves pdf in output directory`() {
-        inputDirectory.resolve("resume.md").toFile().writeText(RESUME)
+        inputDirectory.resolve("resume.md").toFile().writeText(TestData.RESUME)
         pathPicker.result = inputDirectory.toString()
 
         runComposeUiTest {
             setContent { MainApp(viewModel = buildMainScreenViewModel(pathPicker = pathPicker)) }
 
-            onNodeWithTag(MainScreenTestTags.URL_FIELD).performTextInput(URL)
+            onNodeWithTag(MainScreenTestTags.URL_FIELD).performTextInput(TestData.WEBSITE_URL)
             onNodeWithTag(MainScreenTestTags.FILE_NAME_FIELD).performTextClearance()
-            onNodeWithTag(MainScreenTestTags.FILE_NAME_FIELD).performTextInput(FILE_NAME)
+            onNodeWithTag(MainScreenTestTags.FILE_NAME_FIELD).performTextInput(TestData.FILE_NAME)
             onNodeWithTag(MainScreenTestTags.API_KEY_FIELD).performTextInput(System.getenv("TEST_DEEPSEEK_API_KEY"))
 
             onNodeWithTag(MainScreenTestTags.INPUT_BROWSE_BUTTON).performClick()
@@ -52,22 +53,6 @@ class EntrypointTest {
             onNodeWithText("Generation successful").assertExists()
         }
 
-        assertTrue(File(outputDirectory.toFile(), "$FILE_NAME.pdf").exists())
-    }
-
-    private companion object {
-        const val URL = "https://example.com"
-        const val FILE_NAME = "Resume"
-
-        val RESUME = """
-            # John Doe
-            john.doe@example.com | +1 555 1234
-
-            ## Summary
-            Senior software engineer with 10+ years of experience building scalable backend systems.
-
-            ## Skills
-            Languages: Kotlin, Java, TypeScript, Python, SQL
-        """.trimIndent()
+        assertTrue(File(outputDirectory.toFile(), "${TestData.FILE_NAME}.pdf").exists())
     }
 }
