@@ -122,7 +122,7 @@ internal class MainScreenViewModel(
         state.update { state ->
             state.copy(
                 notificationMessage = MainScreenState.NotificationMessage(
-                    message = "Generation successful",
+                    message = SUCCESSFUL_GENERATE_MESSAGE,
                     isError = false
                 )
             )
@@ -150,8 +150,10 @@ internal class MainScreenViewModel(
         generateJob?.cancel()
     }
 
-    private companion object {
-        val initialState = MainScreenState(
+    companion object {
+        const val SUCCESSFUL_GENERATE_MESSAGE = "Generation successful"
+
+        private val initialState = MainScreenState(
             urlField = Field(value = null, isValid = false),
             fileNameField = Field(value = "Resume", isValid = false),
             apiKeyField = Field(value = null, isValid = false),
