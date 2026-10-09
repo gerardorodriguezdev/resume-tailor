@@ -3,6 +3,7 @@ import com.microsoft.playwright.Playwright
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Timeout
 import testing.TestData
+import testing.TestExtensions
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,7 +11,7 @@ import kotlin.test.assertEquals
 @Timeout(value = 120, unit = TimeUnit.SECONDS)
 class HtmlGeneratorTest {
 
-    private val expectedHtml = getExpectedHtml(EXPECTED_HTML_PATH)
+    private val expectedHtml = TestExtensions.readTestResourceText(EXPECTED_HTML_PATH)
 
     @Test
     fun `given sections when generating then matches saved html fixture`() = runTest {
@@ -54,9 +55,6 @@ class HtmlGeneratorTest {
 
     private fun normalizeWhitespace(text: String): String =
         text.replace(Regex("\\s+"), " ").trim()
-
-    private fun getExpectedHtml(path: String): String =
-        javaClass.classLoader.getResourceAsStream(path).use { it!!.readBytes().decodeToString() }
 
     private data class ResumeDocument(
         val language: String,

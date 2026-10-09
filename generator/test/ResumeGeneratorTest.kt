@@ -31,14 +31,14 @@ class ResumeGeneratorTest {
     @Test
     fun `given inputs when generating then calls all dependencies once with chained data`() = runTest {
         generator.generate(
-            inputPath = INPUT_PATH,
-            outputPath = OUTPUT_PATH,
+            inputPath = TestData.INPUT_PATH,
+            outputPath = TestData.OUTPUT_PATH,
             url = TestData.JOB_URL,
             fileName = TestData.FILE_NAME,
         )
 
         assertEquals(1, mdFilesReader.calls)
-        assertEquals(listOf(INPUT_PATH), mdFilesReader.inputPaths)
+        assertEquals(listOf(TestData.INPUT_PATH), mdFilesReader.inputPaths)
 
         assertEquals(1, websiteScanner.calls)
         assertEquals(listOf(TestData.JOB_URL), websiteScanner.urls)
@@ -57,7 +57,7 @@ class ResumeGeneratorTest {
         assertEquals(listOf(HTML), htmlToPdfConverter.htmlContents)
 
         assertEquals(1, pdfSaver.calls)
-        assertEquals(listOf(OUTPUT_PATH), pdfSaver.outputPaths)
+        assertEquals(listOf(TestData.OUTPUT_PATH), pdfSaver.outputPaths)
         assertEquals(listOf(TestData.FILE_NAME), pdfSaver.fileNames)
         assertContentEquals(TestData.PDF_BYTES, pdfSaver.pdfs.single())
 
@@ -67,9 +67,6 @@ class ResumeGeneratorTest {
     }
 
     private companion object {
-        const val INPUT_PATH = "resume"
-        const val OUTPUT_PATH = "output"
-
         const val MD_CONTENT = "# Resume"
         const val WEBSITE_CONTENT = "<html>Job posting</html>"
         const val AGENT_CONTENT = "[{\"type\":\"header\",\"content\":\"John Doe\"}]"

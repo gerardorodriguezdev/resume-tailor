@@ -1,21 +1,19 @@
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.v2.runComposeUiTest
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Timeout
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.io.TempDir
+import testing.E2eTest
 import testing.FakePathPicker
 import testing.TestData
+import testing.TestExtensions
 import ui.screens.MainScreenTestTags
-import java.io.File
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
-@Tag("e2e")
-@EnabledIfEnvironmentVariable(named = "TEST_DEEPSEEK_API_KEY", matches = ".+")
+@E2eTest
 class EntrypointTest {
 
     @TempDir
@@ -29,7 +27,7 @@ class EntrypointTest {
     @Test
     @Timeout(value = 180, unit = TimeUnit.SECONDS)
     fun `given complete inputs when generating then saves pdf in output directory`() {
-        inputDirectory.resolve("resume.md").toFile().writeText(TestData.RESUME)
+        TestExtensions.writeResumeTo(inputDirectory)
         pathPicker.result = inputDirectory.toString()
 
         runComposeUiTest {
@@ -53,6 +51,6 @@ class EntrypointTest {
             onNodeWithText("Generation successful").assertExists()
         }
 
-        assertTrue(File(outputDirectory.toFile(), "${TestData.FILE_NAME}.pdf").exists())
+        assertTrue(TestExtensions.pdfExists(outputDirectory, TestData.FILE_NAME))
     }
 }

@@ -2,3 +2,4 @@ product: jvm/lib
 
 dependencies:
   - //generator
+  - $libs.junit.jupiter.params

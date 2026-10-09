@@ -15,7 +15,7 @@ class MainScreenTest {
 
     @Test
     fun `given url field input when typing then emits change url event`() = runComposeUiTest {
-        setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
+        setMainScreen(emptyState)
 
         onNodeWithTag(MainScreenTestTags.URL_FIELD).performTextInput(TestData.WEBSITE_URL)
 
@@ -24,7 +24,7 @@ class MainScreenTest {
 
     @Test
     fun `given file name field input when typing then emits change file name event`() = runComposeUiTest {
-        setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
+        setMainScreen(emptyState)
 
         onNodeWithTag(MainScreenTestTags.FILE_NAME_FIELD).performTextInput(TestData.MY_RESUME_FILE_NAME)
 
@@ -33,7 +33,7 @@ class MainScreenTest {
 
     @Test
     fun `given api key field input when typing then emits change api key event`() = runComposeUiTest {
-        setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
+        setMainScreen(emptyState)
 
         onNodeWithTag(MainScreenTestTags.API_KEY_FIELD).performTextInput(TestData.API_KEY)
 
@@ -45,7 +45,7 @@ class MainScreenTest {
 
     @Test
     fun `given api key field when clicking toggle then switches between hide and show`() = runComposeUiTest {
-        setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
+        setMainScreen(emptyState)
 
         onNodeWithText("Show").performClick()
 
@@ -58,7 +58,7 @@ class MainScreenTest {
 
     @Test
     fun `given input browse button when clicking then emits open input path picker event`() = runComposeUiTest {
-        setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
+        setMainScreen(emptyState)
 
         onNodeWithTag(MainScreenTestTags.INPUT_BROWSE_BUTTON).performClick()
 
@@ -67,7 +67,7 @@ class MainScreenTest {
 
     @Test
     fun `given output browse button when clicking then emits open output path picker event`() = runComposeUiTest {
-        setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
+        setMainScreen(emptyState)
 
         onNodeWithTag(MainScreenTestTags.OUTPUT_BROWSE_BUTTON).performClick()
 
@@ -76,7 +76,7 @@ class MainScreenTest {
 
     @Test
     fun `given valid state when clicking generate then emits generate event`() = runComposeUiTest {
-        setContent { MainScreen(state = completeState, onEvent = { events.add(it) }) }
+        setMainScreen(completeState)
 
         onNodeWithTag(MainScreenTestTags.GENERATE_BUTTON).performClick()
 
@@ -86,7 +86,7 @@ class MainScreenTest {
     @Test
     fun `given incomplete state when rendering then generate button is disabled and emits nothing`() =
         runComposeUiTest {
-            setContent { MainScreen(state = emptyState, onEvent = { events.add(it) }) }
+            setMainScreen(emptyState)
 
             onNodeWithTag(MainScreenTestTags.GENERATE_BUTTON).assertIsNotEnabled()
             onNodeWithTag(MainScreenTestTags.GENERATE_BUTTON).performClick()
@@ -96,7 +96,7 @@ class MainScreenTest {
 
     @Test
     fun `given complete state when rendering then shows all fields and values`() = runComposeUiTest {
-        setContent { MainScreen(state = completeState, onEvent = {}) }
+        setMainScreen(completeState, onEvent = {})
 
         val semanticsTree = onRoot(useUnmergedTree = true).printToString()
 
@@ -119,6 +119,13 @@ class MainScreenTest {
             expectedTexts.all { it in semanticsTree },
             "Semantics tree is missing some expected texts: $semanticsTree"
         )
+    }
+
+    private fun ComposeUiTest.setMainScreen(
+        state: MainScreenState,
+        onEvent: (MainScreenEvent) -> Unit = { events.add(it) }
+    ) {
+        setContent { MainScreen(state = state, onEvent = onEvent) }
     }
 
     private companion object {

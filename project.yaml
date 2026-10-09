@@ -2,5 +2,4 @@ modules:
   - app
   - cli
   - generator
-  - generator-testing
   - testing

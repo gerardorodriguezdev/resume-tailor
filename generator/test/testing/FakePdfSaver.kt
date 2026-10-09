@@ -13,9 +13,9 @@ internal class FakePdfSaver : PdfSaver {
         private set
 
     override fun save(outputPath: String, fileName: String, pdf: ByteArray) {
+        calls++
         outputPaths.add(outputPath)
         fileNames.add(fileName)
         pdfs.add(pdf)
-        calls++
     }
 }
