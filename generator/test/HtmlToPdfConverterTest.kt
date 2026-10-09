@@ -1,9 +1,12 @@
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Timeout
 import testing.TestData
+import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Timeout(value = 120, unit = TimeUnit.SECONDS)
 class HtmlToPdfConverterTest {
 
     private val expectedPdf = getExpectedPdf(EXPECTED_PDF_PATH)

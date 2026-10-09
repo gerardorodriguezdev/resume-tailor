@@ -1,10 +1,13 @@
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Timeout
 import testing.TestData
+import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Timeout(value = 120, unit = TimeUnit.SECONDS)
 class HtmlGeneratorTest {
 
     private val expectedHtml = getExpectedHtml(EXPECTED_HTML_PATH)

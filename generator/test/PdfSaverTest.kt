@@ -26,11 +26,11 @@ class PdfSaverTest {
     fun `given existing file when saving then writes file with next number`() {
         val outputPath = outputDirectory.toString()
 
-        pdfSaver.save(outputPath, TestData.FILE_NAME, TestData.PDF_BYTES)
-        pdfSaver.save(outputPath, TestData.FILE_NAME, TestData.PDF_BYTES)
+        repeat(3) { pdfSaver.save(outputPath, TestData.FILE_NAME, TestData.PDF_BYTES) }
 
         val files = outputDirectory.toFile().listFiles().orEmpty()
         assertTrue(files.any { it.name == "${TestData.FILE_NAME}.pdf" })
         assertTrue(files.any { it.name == "${TestData.FILE_NAME}-2.pdf" })
+        assertTrue(files.any { it.name == "${TestData.FILE_NAME}-3.pdf" })
     }
 }

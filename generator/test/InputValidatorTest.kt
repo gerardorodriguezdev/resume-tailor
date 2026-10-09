@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EmptySource
 import org.junit.jupiter.params.provider.MethodSource
 import testing.TestData
 import java.nio.file.Path
@@ -56,20 +57,22 @@ class InputValidatorTest {
     }
 
     @ParameterizedTest(name = "given {0} when validating path then returns false")
+    @EmptySource
     @MethodSource("invalidPaths")
-    fun `given invalid path when validating then returns false`(description: String, path: String) {
+    fun `given invalid path when validating then returns false`(path: String) {
         assertFalse(validator.isValidPath(path))
     }
 
     @ParameterizedTest(name = "given {0} when validating url then returns true")
     @MethodSource("validUrls")
-    fun `given valid url when validating then returns true`(description: String, url: String) {
+    fun `given valid url when validating then returns true`(url: String) {
         assertTrue(validator.isValidUrl(url))
     }
 
     @ParameterizedTest(name = "given {0} when validating url then returns false")
+    @EmptySource
     @MethodSource("invalidUrls")
-    fun `given invalid url when validating then returns false`(description: String, url: String) {
+    fun `given invalid url when validating then returns false`(url: String) {
         assertFalse(validator.isValidUrl(url))
     }
 
@@ -118,32 +121,31 @@ class InputValidatorTest {
         )
 
         @JvmStatic
-        fun invalidPaths(): List<Arguments> = listOf(
-            Arguments.of("empty string", ""),
-            Arguments.of("blank string", " "),
-            Arguments.of("non-existent directory", "/no/such/directory"),
+        fun invalidPaths(): List<String> = listOf(
+            " ",
+            "/no/such/directory",
         )
 
         @JvmStatic
-        fun validUrls(): List<Arguments> = listOf(
-            Arguments.of("https url", TestData.WEBSITE_URL),
-            Arguments.of("uppercase scheme", "HTTPS://example.com"),
+        fun validUrls(): List<String> = listOf(
+            TestData.WEBSITE_URL,
+            "HTTPS://example.com",
         )
 
         @JvmStatic
-        fun invalidUrls(): List<Arguments> = listOf(
-            Arguments.of("empty string", ""),
-            Arguments.of("plain text", "not a url"),
-            Arguments.of("http scheme", "http://example.com"),
-            Arguments.of("javascript scheme", "javascript:alert(1)"),
-            Arguments.of("file scheme", "file:///etc/passwd"),
-            Arguments.of("ftp scheme", "ftp://example.com"),
-            Arguments.of("localhost host", "https://localhost/admin"),
-            Arguments.of("localhost subdomain", "https://foo.localhost/admin"),
-            Arguments.of("loopback address", "https://127.0.0.1/admin"),
-            Arguments.of("site local address", "https://192.168.1.1/admin"),
-            Arguments.of("user info", "https://user@example.com"),
-            Arguments.of("missing host", "https://"),
+        fun invalidUrls(): List<String> = listOf(
+            " ",
+            "not a url",
+            "http://example.com",
+            "javascript:alert(1)",
+            "file:///etc/passwd",
+            "ftp://example.com",
+            "https://localhost/admin",
+            "https://foo.localhost/admin",
+            "https://127.0.0.1/admin",
+            "https://192.168.1.1/admin",
+            "https://user@example.com",
+            "https://",
         )
     }
 }

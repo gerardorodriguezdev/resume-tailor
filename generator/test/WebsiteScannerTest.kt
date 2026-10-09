@@ -1,20 +1,31 @@
 import com.sun.net.httpserver.HttpServer
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Timeout
+import org.junit.jupiter.api.extension.AfterEachCallback
+import org.junit.jupiter.api.extension.BeforeEachCallback
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.RegisterExtension
 import testing.FakeInputValidator
 import java.net.InetSocketAddress
-import kotlin.test.*
+import java.util.concurrent.TimeUnit
+import kotlin.test.Test
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
+@Timeout(value = 120, unit = TimeUnit.SECONDS)
 class WebsiteScannerTest {
-    private val server = startServer(HTML)
+    @RegisterExtension
+    @JvmField
+    internal val server = HttpServerExtension(HTML)
 
-    @AfterTest
-    fun closeServer() {
-        server.stop(0)
-    }
+    @RegisterExtension
+    @JvmField
+    internal val maliciousServer = HttpServerExtension(MALICIOUS_HTML)
 
     @Test
     fun `given valid website when scanning then returns sanitized text string`() = runTest {
-        val result = PlaywrightWebsiteScanner(FakeInputValidator()).scan("http://localhost:${server.address.port}/")
+        val result = PlaywrightWebsiteScanner(FakeInputValidator()).scan(server.url)
 
         assertTrue("Local Test Page" in result)
         assertTrue("Local test description" in result)
@@ -28,27 +39,10 @@ class WebsiteScannerTest {
 
     @Test
     fun `given website with tag text in content when scanning then throws IllegalArgumentException`() = runTest {
-        val maliciousServer = startServer(MALICIOUS_HTML)
-
-        try {
-            assertFailsWith<IllegalArgumentException> {
-                PlaywrightWebsiteScanner(FakeInputValidator()).scan("http://localhost:${maliciousServer.address.port}/")
-            }
-        } finally {
-            maliciousServer.stop(0)
+        assertFailsWith<IllegalArgumentException> {
+            PlaywrightWebsiteScanner(FakeInputValidator()).scan(maliciousServer.url)
         }
     }
-
-    private fun startServer(html: String): HttpServer =
-        HttpServer.create(InetSocketAddress(0), 0).apply {
-            createContext("/") { exchange ->
-                val bytes = html.toByteArray()
-                exchange.responseHeaders.add("Content-Type", "text/html; charset=utf-8")
-                exchange.sendResponseHeaders(200, bytes.size.toLong())
-                exchange.responseBody.use { it.write(bytes) }
-            }
-            start()
-        }
 
     private companion object {
         const val HTML = """
@@ -83,5 +77,28 @@ class WebsiteScannerTest {
             </body>
             </html>
         """
+    }
+
+    internal class HttpServerExtension(private val html: String) : BeforeEachCallback, AfterEachCallback {
+        private lateinit var server: HttpServer
+
+        val url: String
+            get() = "http://localhost:${server.address.port}/"
+
+        override fun beforeEach(context: ExtensionContext) {
+            server = HttpServer.create(InetSocketAddress(0), 0).apply {
+                createContext("/") { exchange ->
+                    val bytes = html.toByteArray()
+                    exchange.responseHeaders.add("Content-Type", "text/html; charset=utf-8")
+                    exchange.sendResponseHeaders(200, bytes.size.toLong())
+                    exchange.responseBody.use { it.write(bytes) }
+                }
+                start()
+            }
+        }
+
+        override fun afterEach(context: ExtensionContext) {
+            server.stop(0)
+        }
     }
 }

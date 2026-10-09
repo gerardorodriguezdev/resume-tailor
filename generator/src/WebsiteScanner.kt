@@ -1,5 +1,6 @@
 import com.microsoft.playwright.*
 import com.microsoft.playwright.options.ServiceWorkerPolicy
+import kotlin.time.Duration.Companion.seconds
 
 internal interface WebsiteScanner {
     suspend fun scan(url: String): String
@@ -38,12 +39,12 @@ internal class PlaywrightWebsiteScanner(
     }
 
     private fun Page.extractSiteText(url: String): String {
-        setDefaultTimeout(ACTION_TIMEOUT_MILLIS)
-        setDefaultNavigationTimeout(NAVIGATION_TIMEOUT_MILLIS)
+        setDefaultTimeout(ACTION_TIMEOUT.inWholeMilliseconds.toDouble())
+        setDefaultNavigationTimeout(NAVIGATION_TIMEOUT.inWholeMilliseconds.toDouble())
 
         navigate(url)
 
-        waitForTimeout(RENDER_WAIT_MILLIS)
+        waitForTimeout(RENDER_WAIT.inWholeMilliseconds.toDouble())
 
         val text = listOfNotNull(
             pageTitle(),
@@ -74,9 +75,9 @@ internal class PlaywrightWebsiteScanner(
     private val Page.bodyLocator: Locator get() = locator(BODY_LOCATOR)
 
     private companion object {
-        const val RENDER_WAIT_MILLIS = 2500.0
-        const val ACTION_TIMEOUT_MILLIS = 5000.0
-        const val NAVIGATION_TIMEOUT_MILLIS = 15000.0
+        val RENDER_WAIT = 2.5.seconds
+        val ACTION_TIMEOUT = 5.seconds
+        val NAVIGATION_TIMEOUT = 15.seconds
         const val DESCRIPTION_LOCATOR = "meta[name=description]"
         const val CONTENT_LOCATOR = "main, article"
         const val BODY_LOCATOR = "body"
