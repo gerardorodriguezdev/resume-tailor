@@ -11,3 +11,4 @@ settings:
 
 test-dependencies:
   - $libs.junit.jupiter.params
+  - $libs.kotlinx.coroutines.core
