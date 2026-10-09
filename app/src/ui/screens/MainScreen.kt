@@ -28,6 +28,7 @@ internal fun MainScreen(
                     val isError = state.notificationMessage?.isError == true
                     Snackbar(
                         snackbarData = snackbarData,
+                        modifier = Modifier.testTag(MainScreenTestTags.SNACKBAR),
                         containerColor = if (isError) MaterialTheme.colorScheme.error else SnackbarDefaults.color,
                         contentColor = if (isError) MaterialTheme.colorScheme.onError else SnackbarDefaults.contentColor,
                     )
@@ -173,4 +174,5 @@ internal object MainScreenTestTags {
     const val INPUT_BROWSE_BUTTON = "MainScreen.inputBrowseButton"
     const val OUTPUT_BROWSE_BUTTON = "MainScreen.outputBrowseButton"
     const val GENERATE_BUTTON = "MainScreen.generateButton"
+    const val SNACKBAR = "MainScreen.snackbar"
 }
