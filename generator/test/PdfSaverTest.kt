@@ -1,5 +1,6 @@
+import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import kotlin.io.path.createTempDirectory
+import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertTrue
@@ -7,7 +8,9 @@ import kotlin.test.assertTrue
 class PdfSaverTest {
 
     private val pdfSaver = DefaultPdfSaver()
-    private val outputDirectory = createTempDirectory("pdf-saver-output")
+
+    @TempDir
+    lateinit var outputDirectory: Path
 
     @Test
     fun `given output path and pdf bytes when saving then writes pdf file`() {

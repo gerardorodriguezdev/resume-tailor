@@ -1,8 +1,8 @@
+import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.createTempFile
+import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -10,8 +10,12 @@ import kotlin.test.assertTrue
 class InputValidatorTest {
 
     private val validator = DefaultInputValidator()
-    private val directory = createTempDirectory("input-validator")
-    private val file = createTempFile("input-validator")
+
+    @TempDir
+    lateinit var directory: Path
+
+    @TempDir
+    lateinit var fileDirectory: Path
 
     @ParameterizedTest(name = "given {0} when validating api key then returns true")
     @MethodSource("validApiKeys")
@@ -44,6 +48,9 @@ class InputValidatorTest {
 
     @Test
     fun `given existing file path when validating then returns false`() {
+        val file = fileDirectory.resolve("file.txt")
+        file.toFile().writeText("content")
+
         assertFalse(validator.isValidPath(file.toString()))
     }
 

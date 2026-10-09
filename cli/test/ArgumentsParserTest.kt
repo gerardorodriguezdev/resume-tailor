@@ -1,16 +1,21 @@
+import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import testing.FakeInputValidator
-import kotlin.io.path.createTempDirectory
+import java.nio.file.Path
 import kotlin.test.*
 
 class ArgumentsParserTest {
 
     private val inputValidator = FakeInputValidator()
     private val parser = ArgumentsParser(inputValidator)
-    private val inputDirectory = createTempDirectory("input-directory")
-    private val outputDirectory = createTempDirectory("output-directory")
+
+    @TempDir
+    lateinit var inputDirectory: Path
+
+    @TempDir
+    lateinit var outputDirectory: Path
 
     @Test
     fun `given help argument when parsing then returns help request with text`() {

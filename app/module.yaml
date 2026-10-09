@@ -12,3 +12,8 @@ dependencies:
 
 settings:
   compose: enabled
+
+test-dependencies:
+  - $compose.uiTest
+  - $libs.kotlinx.coroutines.test
+  - $libs.junit.jupiter.params
