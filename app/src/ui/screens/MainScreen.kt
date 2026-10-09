@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import ui.components.Button
 import ui.components.TextField
@@ -46,7 +47,7 @@ internal fun MainScreen(
                     field = state.urlField,
                     onTextChanged = { onEvent(MainScreenEvent.ChangeUrl(it)) },
                     supportingText = state.urlField.supportingText(invalidText = "Invalid URL"),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag(MainScreenTestTags.URL_FIELD),
                 )
 
                 TextField(
@@ -57,7 +58,7 @@ internal fun MainScreen(
                         templateText = state.fileNameField.value?.let { value -> "$value.pdf" } ?: "MyFileName.pdf",
                         invalidText = "Invalid file name"
                     ),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag(MainScreenTestTags.FILE_NAME_FIELD),
                 )
 
                 TextField(
@@ -66,7 +67,7 @@ internal fun MainScreen(
                     onTextChanged = { onEvent(MainScreenEvent.ChangeApiKey(it)) },
                     supportingText = state.apiKeyField.supportingText(invalidText = "Invalid api key"),
                     isPassword = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag(MainScreenTestTags.API_KEY_FIELD),
                 )
 
                 Row(
@@ -78,11 +79,12 @@ internal fun MainScreen(
                         field = state.inputField,
                         supportingText = state.inputField.supportingText(invalidText = "Invalid path"),
                         readOnly = true,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).testTag(MainScreenTestTags.INPUT_FIELD),
                     )
                     Button(
                         text = "Browse",
                         onClick = { onEvent(MainScreenEvent.OpenInputPathPicker) },
+                        modifier = Modifier.testTag(MainScreenTestTags.INPUT_BROWSE_BUTTON),
                     )
                 }
 
@@ -95,11 +97,12 @@ internal fun MainScreen(
                         field = state.outputField,
                         supportingText = state.outputField.supportingText(invalidText = "Invalid path"),
                         readOnly = true,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).testTag(MainScreenTestTags.OUTPUT_FIELD),
                     )
                     Button(
                         text = "Browse",
                         onClick = { onEvent(MainScreenEvent.OpenOutputPathPicker) },
+                        modifier = Modifier.testTag(MainScreenTestTags.OUTPUT_BROWSE_BUTTON),
                     )
                 }
 
@@ -108,6 +111,7 @@ internal fun MainScreen(
                     isEnabled = state.isGenerateButtonEnabled,
                     isLoading = state.isGenerateButtonLoading,
                     onClick = { onEvent(MainScreenEvent.Generate) },
+                    modifier = Modifier.testTag(MainScreenTestTags.GENERATE_BUTTON),
                 )
             }
         }
@@ -160,3 +164,13 @@ internal data class MainScreenState(
     )
 }
 
+internal object MainScreenTestTags {
+    const val URL_FIELD = "MainScreen.urlField"
+    const val FILE_NAME_FIELD = "MainScreen.fileNameField"
+    const val API_KEY_FIELD = "MainScreen.apiKeyField"
+    const val INPUT_FIELD = "MainScreen.inputField"
+    const val OUTPUT_FIELD = "MainScreen.outputField"
+    const val INPUT_BROWSE_BUTTON = "MainScreen.inputBrowseButton"
+    const val OUTPUT_BROWSE_BUTTON = "MainScreen.outputBrowseButton"
+    const val GENERATE_BUTTON = "MainScreen.generateButton"
+}
