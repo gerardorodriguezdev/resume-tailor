@@ -24,6 +24,8 @@ jobs:
           java-version: 25
 
       - name: Test
+        env:
+          TEST_DEEPSEEK_API_KEY: ${{ secrets.TEST_DEEPSEEK_API_KEY }}
         run: ./kotlin check
 
       - name: Build
