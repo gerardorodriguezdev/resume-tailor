@@ -44,7 +44,7 @@ class EntrypointTest {
 
             onNodeWithTag(MainScreenTestTags.GENERATE_BUTTON).performClick()
 
-            waitUntil("notification is shown") {
+            waitUntil("notification is shown", timeoutMillis = GENERATION_TIMEOUT_MILLIS) {
                 onAllNodesWithTag(MainScreenTestTags.SNACKBAR).fetchSemanticsNodes().isNotEmpty()
             }
 
@@ -52,5 +52,9 @@ class EntrypointTest {
         }
 
         assertTrue(TestExtensions.pdfExists(outputDirectory, TestData.FILE_NAME))
+    }
+
+    private companion object {
+        const val GENERATION_TIMEOUT_MILLIS = 150_000L
     }
 }

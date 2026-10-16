@@ -59,14 +59,13 @@ internal class PlaywrightWebsiteScanner(
 
     private fun Page.pageTitle(): String = title()
 
-    private fun Page.pageDescription(): String? = descriptionLocator.getAttribute("content")
+    private fun Page.pageDescription(): String? =
+        descriptionLocator.firstOrNull()?.getAttribute("content")
 
     private fun Page.pageContent(): String =
-        try {
-            contentLocator.first().innerText()
-        } catch (_: Exception) {
-            bodyLocator.innerText()
-        }
+        contentLocator.firstOrNull()?.innerText() ?: bodyLocator.innerText()
+
+    private fun Locator.firstOrNull(): Locator? = takeIf { count() > 0 }?.first()
 
     private val Page.descriptionLocator: Locator get() = locator(DESCRIPTION_LOCATOR)
 
