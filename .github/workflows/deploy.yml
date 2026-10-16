@@ -65,36 +65,7 @@ jobs:
         env:
           CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
           CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-        run: |
-          umask 077
-
-          KEYCHAIN_PASSWORD=$(uuidgen)
-          SOURCE_P12="$RUNNER_TEMP/source.p12"
-          IMPORT_P12="$RUNNER_TEMP/import.p12"
-          IMPORT_PASSWORD=$(uuidgen)
-          export IMPORT_PASSWORD
-          trap 'rm -f "$SOURCE_P12" "$IMPORT_P12"' EXIT
-
-          read_source_p12() {
-            /usr/bin/openssl pkcs12 -in "$SOURCE_P12" -passin env:CERTIFICATE_PASSWORD "$@"
-          }
-
-          printf '%s' "$CERTIFICATE_P12" | base64 --decode > "$SOURCE_P12"
-          /usr/bin/openssl pkcs12 -export \
-            -in <(read_source_p12 -nokeys) \
-            -inkey <(read_source_p12 -nocerts -nodes) \
-            -passout env:IMPORT_PASSWORD \
-            -out "$IMPORT_P12"
-
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-          security set-keychain-settings -lut 3600 "$KEYCHAIN"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-
-          security import "$IMPORT_P12" -k "$KEYCHAIN" -P "$IMPORT_PASSWORD" -x \
-            -T /usr/bin/codesign \
-            -T /usr/bin/productbuild
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
-          security list-keychains -d user -s "$KEYCHAIN"
+        run: .github/scripts/setup-keychain.sh
 
       - name: Package app
         env:
@@ -122,8 +93,8 @@ jobs:
             --type pkg \
             --name resume-tailor \
             --input build/tasks/_cli_executableJarJvm \
-            --dest dist \
             --main-jar cli-jvm-executable.jar \
+            --dest dist \
             --mac-package-identifier "$BUNDLE_ID.cli" \
             --mac-sign \
             --mac-signing-keychain "$KEYCHAIN" \
@@ -134,18 +105,7 @@ jobs:
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
-        run: |
-          umask 077
-          trap 'rm -f "$RUNNER_TEMP/api-key.p8"' EXIT
-          printf '%s' "$APPLE_API_KEY" > "$RUNNER_TEMP/api-key.p8"
-          for file in dist/*.dmg dist/*.pkg; do
-            xcrun notarytool submit "$file" \
-              --key "$RUNNER_TEMP/api-key.p8" \
-              --key-id "$APPLE_API_KEY_ID" \
-              --issuer "$APPLE_API_ISSUER_ID" \
-              --wait
-            xcrun stapler staple "$file"
-          done
+        run: .github/scripts/notarize.sh
 
       - name: Upload
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
