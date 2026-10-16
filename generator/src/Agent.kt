@@ -86,14 +86,14 @@ internal class DeepSeekAgent(
             
             The array must start with one Header section containing the contact details.
             
-            Then include Content sections, only when the resume has relevant information for them. Return them in exactly the
-            following order:
+            Then include every one of the following Content sections, all of them mandatory, in exactly this order:
             ${sectionList()}
             
             # Rules
             
             - Return the sections in exactly the order listed above. Never reorder, rename, merge, or split sections.
-            - Omit a Content section when the resume lacks relevant facts; never pad with invented content.
+            - Never omit a Content section. When the resume has no explicit content for one, summarize the closest relevant
+              facts from the resume instead; never pad with invented content.
             - Highlight and reword skills that match the job posting.
             - Keep the total resume less than 600 words.
             - Output must be valid JSON: escape newlines as \n and quotes as \".
