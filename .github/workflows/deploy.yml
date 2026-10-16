@@ -67,6 +67,14 @@ jobs:
           CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
         run: .github/scripts/setup-keychain.sh
 
+      - name: Sign nested binaries
+        env:
+          SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
+        run: |
+          .github/scripts/sign-nested-binaries.sh \
+            build/tasks/_app_executableJarJvm/app-jvm-executable.jar \
+            build/tasks/_cli_executableJarJvm/cli-jvm-executable.jar
+
       - name: Package app
         env:
           SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
