@@ -1,7 +1,9 @@
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.v2.runComposeUiTest
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.io.TempDir
+import presentation.MainScreenViewModel
 import testing.E2eTest
 import testing.FakePathPicker
 import testing.TestData
@@ -10,6 +12,7 @@ import ui.screens.MainScreenTestTags
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -49,7 +52,15 @@ class EntrypointTest {
                 onAllNodesWithTag(MainScreenTestTags.SNACKBAR).fetchSemanticsNodes().isNotEmpty()
             }
 
-            onNodeWithText("Generation successful").assertExists()
+            val notificationTexts = onAllNodes(
+                matcher = hasAnyAncestor(hasTestTag(MainScreenTestTags.SNACKBAR)),
+                useUnmergedTree = true,
+            )
+                .fetchSemanticsNodes()
+                .flatMap { node -> node.config.getOrElse(SemanticsProperties.Text) { emptyList() } }
+                .map { text -> text.text }
+
+            assertContains(notificationTexts, MainScreenViewModel.SUCCESSFUL_GENERATE_MESSAGE)
         }
 
         assertTrue(TestExtensions.pdfExists(outputDirectory, TestData.FILE_NAME))
