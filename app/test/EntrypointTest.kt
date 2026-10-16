@@ -11,6 +11,7 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalTestApi::class)
 @E2eTest
@@ -30,7 +31,7 @@ class EntrypointTest {
         TestExtensions.writeResumeTo(inputDirectory)
         pathPicker.result = inputDirectory.toString()
 
-        runComposeUiTest {
+        runComposeUiTest(testTimeout = GENERATION_TIMEOUT_MILLIS.milliseconds) {
             setContent { MainApp(viewModel = buildMainScreenViewModel(pathPicker = pathPicker)) }
 
             onNodeWithTag(MainScreenTestTags.URL_FIELD).performTextInput(TestData.WEBSITE_URL)
