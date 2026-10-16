@@ -1,2 +1,7 @@
 /build
 .idea
+.DS_Store
+.env
+*.p12
+*.p8
+dist/

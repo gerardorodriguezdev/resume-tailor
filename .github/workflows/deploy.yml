@@ -1,0 +1,159 @@
+name: Deploy
+
+on: push
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Test
+        run: ./kotlin check
+
+      - name: Build
+        run: ./kotlin package --module app --module cli --format executable-jar
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jars
+          path: |
+            build/tasks/_app_executableJarJvm/
+            build/tasks/_cli_executableJarJvm/
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      KEYCHAIN: build.keychain
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: jars
+          path: build/tasks
+
+      - name: Setup keychain
+        env:
+          CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          umask 077
+
+          KEYCHAIN_PASSWORD=$(uuidgen)
+          SOURCE_P12="$RUNNER_TEMP/source.p12"
+          IMPORT_P12="$RUNNER_TEMP/import.p12"
+          IMPORT_PASSWORD=$(uuidgen)
+          export IMPORT_PASSWORD
+          trap 'rm -f "$SOURCE_P12" "$IMPORT_P12"' EXIT
+
+          read_source_p12() {
+            /usr/bin/openssl pkcs12 -in "$SOURCE_P12" -passin env:CERTIFICATE_PASSWORD "$@"
+          }
+
+          printf '%s' "$CERTIFICATE_P12" | base64 --decode > "$SOURCE_P12"
+          /usr/bin/openssl pkcs12 -export \
+            -in <(read_source_p12 -nokeys) \
+            -inkey <(read_source_p12 -nocerts -nodes) \
+            -passout env:IMPORT_PASSWORD \
+            -out "$IMPORT_P12"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+
+          security import "$IMPORT_P12" -k "$KEYCHAIN" -P "$IMPORT_PASSWORD" -x \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productbuild
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN"
+
+      - name: Package app
+        env:
+          SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
+          BUNDLE_ID: ${{ secrets.MACOS_BUNDLE_ID }}
+        run: |
+          jpackage \
+            --type dmg \
+            --name "Resume Tailor" \
+            --icon app/icon/icon.icns \
+            --input build/tasks/_app_executableJarJvm \
+            --main-jar app-jvm-executable.jar \
+            --dest dist \
+            --mac-package-identifier "$BUNDLE_ID" \
+            --mac-sign \
+            --mac-signing-keychain "$KEYCHAIN" \
+            --mac-signing-key-user-name "$SIGNING_NAME"
+
+      - name: Package cli
+        env:
+          SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
+          BUNDLE_ID: ${{ secrets.MACOS_BUNDLE_ID }}
+        run: |
+          jpackage \
+            --type pkg \
+            --name resume-tailor \
+            --input build/tasks/_cli_executableJarJvm \
+            --dest dist \
+            --main-jar cli-jvm-executable.jar \
+            --mac-package-identifier "$BUNDLE_ID.cli" \
+            --mac-sign \
+            --mac-signing-keychain "$KEYCHAIN" \
+            --mac-signing-key-user-name "$SIGNING_NAME"
+
+      - name: Notarize
+        env:
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+        run: |
+          umask 077
+          trap 'rm -f "$RUNNER_TEMP/api-key.p8"' EXIT
+          printf '%s' "$APPLE_API_KEY" > "$RUNNER_TEMP/api-key.p8"
+          for file in dist/*.dmg dist/*.pkg; do
+            xcrun notarytool submit "$file" \
+              --key "$RUNNER_TEMP/api-key.p8" \
+              --key-id "$APPLE_API_KEY_ID" \
+              --issuer "$APPLE_API_ISSUER_ID" \
+              --wait
+            xcrun stapler staple "$file"
+          done
+
+      - name: Upload
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: resume-tailor
+          path: |
+            dist/*.dmg
+            dist/*.pkg
+          if-no-files-found: error
+
+      - name: Cleanup keychain
+        if: always()
+        run: security delete-keychain "$KEYCHAIN" || true
