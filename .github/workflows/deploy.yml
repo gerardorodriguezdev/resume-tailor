@@ -66,16 +66,7 @@ jobs:
       - name: Next version
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          latest=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName --jq '.[].tagName' \
-            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)
-          if [[ -z "$latest" ]]; then
-            version=1.0.0
-          else
-            IFS=. read -r major minor patch <<< "${latest#v}"
-            version="$major.$minor.$((patch + 1))"
-          fi
-          echo "VERSION=$version" >> "$GITHUB_ENV"
+        run: .github/scripts/next-version.sh
 
       - name: Setup keychain
         env:
