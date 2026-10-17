@@ -126,6 +126,14 @@ jobs:
             --mac-signing-keychain "$KEYCHAIN" \
             --mac-signing-key-user-name "$SIGNING_NAME"
 
+      - name: Smoke test app
+        run: .github/scripts/smoke-test-app.sh
+
+      - name: Smoke test cli
+        run: |
+          pkgutil --expand-full dist/*.pkg "$RUNNER_TEMP/pkg"
+          "$RUNNER_TEMP"/pkg/*/Payload/resume-tailor.app/Contents/MacOS/resume-tailor --help | grep 'Usage: resume-tailor'
+
       - name: Notarize
         env:
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
