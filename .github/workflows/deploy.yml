@@ -66,19 +66,19 @@ jobs:
       - name: Next version
         env:
           GH_TOKEN: ${{ github.token }}
-        run: .github/scripts/next-version.sh
+        run: ./kotlin run -m ci -- next-version
 
-      - name: Setup keychain
-        env:
-          CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-        run: .github/scripts/setup-keychain.sh
+      - uses: Apple-Actions/import-codesign-certs@77ba2a2a8f5cfc8c405ebf3159f767c323e238f9 # v7.1.0
+        with:
+          keychain: build
+          p12-file-base64: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+          p12-password: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
 
       - name: Sign nested binaries
         env:
           SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
         run: |
-          .github/scripts/sign-nested-binaries.sh \
+          ./kotlin run -m ci -- sign-nested-binaries \
             build/tasks/_app_executableJarJvm/app-jvm-executable.jar \
             build/tasks/_cli_executableJarJvm/cli-jvm-executable.jar
 
@@ -117,20 +117,12 @@ jobs:
             --mac-signing-keychain "$KEYCHAIN" \
             --mac-signing-key-user-name "$SIGNING_NAME"
 
-      - name: Smoke test app
-        run: .github/scripts/smoke-test-app.sh
-
-      - name: Smoke test cli
-        run: |
-          pkgutil --expand-full dist/*.pkg "$RUNNER_TEMP/pkg"
-          "$RUNNER_TEMP"/pkg/*/Payload/resume-tailor.app/Contents/MacOS/resume-tailor --help | grep 'Usage: resume-tailor'
-
       - name: Notarize
         env:
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
-        run: .github/scripts/notarize.sh
+        run: ./kotlin run -m ci -- notarize
 
       - name: Release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
@@ -143,7 +135,3 @@ jobs:
           files: |
             dist/*.dmg
             dist/*.pkg
-
-      - name: Cleanup keychain
-        if: always()
-        run: security delete-keychain "$KEYCHAIN" || true

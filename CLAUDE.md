@@ -17,6 +17,7 @@ Desktop GUI.
     - `cli` — jvm/app, `mainClass: EntrypointKt`.
     - `app` — jvm/app, Compose Desktop GUI.
     - `testing` — jvm/lib, shared test utilities, consumed via `test-dependencies: - //testing`.
+    - `ci` — jvm/app, release automation for `deploy.yml`, run as `./kotlin run -m ci -- <command>`.
 - Adding a module: create its `module.yaml`, list it in `project.yaml`, add new library versions to
   `libs.versions.toml`.
 
