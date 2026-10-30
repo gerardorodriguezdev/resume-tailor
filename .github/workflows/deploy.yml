@@ -31,7 +31,8 @@ jobs:
       - name: Build
         run: ./kotlin package --module app --module cli --format executable-jar
 
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: jars
           path: |
@@ -58,17 +59,22 @@ jobs:
           distribution: temurin
           java-version: 25
 
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - name: Downloads build artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: jars
           path: build/tasks
 
-      - name: Next version
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: ./kotlin run -m ci -- next-version
+      - name: Compute next release version
+        id: version
+        uses: mathieudutour/github-tag-action@af99e60ce8132224b8e6ebab5023449fe256ed46 # v7
+        with:
+          github_token: ${{ github.token }}
+          dry_run: true
+          release_branches: .*
 
-      - uses: Apple-Actions/import-codesign-certs@77ba2a2a8f5cfc8c405ebf3159f767c323e238f9 # v7.1.0
+      - name: Setup keychain
+        uses: Apple-Actions/import-codesign-certs@77ba2a2a8f5cfc8c405ebf3159f767c323e238f9 # v7.1.0
         with:
           keychain: build
           p12-file-base64: ${{ secrets.MACOS_CERTIFICATE_P12 }}
@@ -86,6 +92,7 @@ jobs:
         env:
           SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
           BUNDLE_ID: ${{ secrets.MACOS_BUNDLE_ID }}
+          VERSION: ${{ steps.version.outputs.new_version }}
         run: |
           jpackage \
             --type dmg \
@@ -104,6 +111,7 @@ jobs:
         env:
           SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
           BUNDLE_ID: ${{ secrets.MACOS_BUNDLE_ID }}
+          VERSION: ${{ steps.version.outputs.new_version }}
         run: |
           jpackage \
             --type pkg \
@@ -117,18 +125,18 @@ jobs:
             --mac-signing-keychain "$KEYCHAIN" \
             --mac-signing-key-user-name "$SIGNING_NAME"
 
-      - name: Notarize
+      - name: Notarize artifacts
         env:
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
         run: ./kotlin run -m ci -- notarize
 
-      - name: Release
+      - name: Release artifacts
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
-          tag_name: v${{ env.VERSION }}
-          name: v${{ env.VERSION }}
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: ${{ steps.version.outputs.new_tag }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           fail_on_unmatched_files: true

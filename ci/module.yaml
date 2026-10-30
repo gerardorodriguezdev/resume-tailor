@@ -1,5 +1,8 @@
 product: jvm/app
 
+dependencies:
+  - $libs.clikt
+
 settings:
   kotlin:
     serialization: json
