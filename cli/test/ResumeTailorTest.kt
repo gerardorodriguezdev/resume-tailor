@@ -91,28 +91,24 @@ class ResumeTailorTest {
     }
 
     @Test
-    fun `given invalid input path when running then fails without generating`() = runTest {
-        inputValidator.isValidPathResult = false
-
+    fun `given nonexistent input path when running then fails without generating`() = runTest {
         val result = command.test(
             arrayOf("--website=${TestData.WEBSITE_URL}", "--apikey=${TestData.API_KEY}", "--input=/any/path"),
         )
 
         assertEquals(1, result.statusCode)
-        assertContains(result.stderr, "Invalid input path")
+        assertContains(result.stderr, "does not exist")
         assertEquals(0, resumeGenerator.calls)
     }
 
     @Test
-    fun `given invalid output path when running then fails without generating`() = runTest {
-        inputValidator.isValidPathResult = false
-
+    fun `given nonexistent output path when running then fails without generating`() = runTest {
         val result = command.test(
             arrayOf("--website=${TestData.WEBSITE_URL}", "--apikey=${TestData.API_KEY}", "--output=/any/path"),
         )
 
         assertEquals(1, result.statusCode)
-        assertContains(result.stderr, "Invalid output path")
+        assertContains(result.stderr, "does not exist")
         assertEquals(0, resumeGenerator.calls)
     }
 

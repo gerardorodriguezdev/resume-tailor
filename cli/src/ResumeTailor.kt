@@ -1,5 +1,7 @@
 import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.types.path
+import kotlin.io.path.Path
 
 internal class ResumeTailor(
     inputValidator: InputValidator,
@@ -11,12 +13,12 @@ internal class ResumeTailor(
         .check("Invalid website url") { url -> inputValidator.isValidUrl(url) }
 
     private val inputPath by option("--input", metavar = "<path>", help = "Directory with md files")
-        .default(System.getProperty("user.dir"))
-        .check("Invalid input path") { inputPath -> inputValidator.isValidPath(inputPath) }
+        .path(mustExist = true, canBeFile = false, mustBeReadable = true)
+        .default(Path(System.getProperty("user.dir")))
 
     private val outputPath by option("--output", metavar = "<path>", help = "Directory to save the generated pdf")
-        .default(System.getProperty("user.dir"))
-        .check("Invalid output path") { outputPath -> inputValidator.isValidPath(outputPath) }
+        .path(mustExist = true, canBeFile = false, mustBeWritable = true)
+        .default(Path(System.getProperty("user.dir")))
 
     private val fileName by option("--filename", metavar = "<name>", help = "Name of the generated pdf file")
         .default(DEFAULT_FILE_NAME)
@@ -34,8 +36,8 @@ internal class ResumeTailor(
             verbose = verbose,
         )
         buildResumeGenerator(apiKey, logger).generate(
-            inputPath = inputPath,
-            outputPath = outputPath,
+            inputPath = "$inputPath",
+            outputPath = "$outputPath",
             url = url,
             fileName = fileName,
         )
