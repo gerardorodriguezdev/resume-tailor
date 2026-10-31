@@ -2,8 +2,8 @@ product: jvm/app
 
 dependencies:
   - //generator
+  - $libs.clikt
   - $libs.logback.classic
-  - $libs.kotlin.logging
 
 settings:
   jvm:
@@ -13,3 +13,4 @@ test-dependencies:
   - //testing
   - $libs.junit.jupiter.params
   - $libs.kotlinx.coroutines.core
+  - $libs.kotlinx.coroutines.test

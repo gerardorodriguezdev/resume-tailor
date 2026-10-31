@@ -29,8 +29,9 @@ Desktop GUI.
 - One test class: `./kotlin test -m generator --include-classes 'ResumeGeneratorTest'`
 - One test method: `./kotlin test --include-test '<FQN with package and class>'`
 - E2E tests (skipped otherwise): `TEST_DEEPSEEK_API_KEY=... ./kotlin check`
-- Run CLI: `./kotlin run -m cli -- --website=<url> [--input --output --filename --apikey --verbose]` (arguments are
-  `--key=value`; input/output default to the working dir, the API key falls back to the `API_KEY` env var)
+- Run CLI: `./kotlin run -m cli -- --website=<url> [--input --output --filename --apikey --verbose]` (parsed by clikt
+  in `cli/src/ResumeTailor.kt`; input/output default to the working dir, the API key falls back to the `API_KEY` env
+  var, then to a hidden prompt)
 - Run GUI: `./kotlin run -m app`; hot reload: `./kotlin run -m app --compose-hot-reload-mode` (auto-reload on save only
   works via the IDE's "Run with Compose Hot Reload"; the CLI does not watch files)
 - List modules/checks: `./kotlin show modules`, `./kotlin show checks`
@@ -52,9 +53,12 @@ Conventions:
   `KotlinLogger`.
 - Packages: `generator` has none except `models`; `cli` has none; `app` is package-per-layer (`presentation`,
   `ui.screens`, `ui.models`, `ui.components`, `utils`); `testing` uses package `testing`.
-- Invalid input is rejected with `require { }` (throws `IllegalArgumentException`); tests rely on that.
+- Invalid input is rejected with `require { }` (throws `IllegalArgumentException`); tests rely on that. Exception: `cli`
+  validates options with clikt `.check { }`, which prints the error and exits with status 1.
 - Logging: `Logger` interface with lazy lambda messages; `KotlinLogger` delegates to kotlin-logging and gates on
-  `verbose`; each app's `logback.xml` routes only the `DefaultLogger` logger and silences everything else.
+  `verbose`; `app`'s `logback.xml` routes only the `DefaultLogger` logger and silences everything else; `cli` logs
+  through
+  `EchoLogger` (clikt `echo`) and its `logback.xml` silences everything.
 - GUI: keep `DispatchersProvider` injectable in the ViewModel (never call `Dispatchers` directly); generation runs on
   `DispatchersProvider.io.limitedParallelism(1)` so a new run cancels the previous one.
 
