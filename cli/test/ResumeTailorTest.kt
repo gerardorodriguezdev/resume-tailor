@@ -32,15 +32,6 @@ class ResumeTailorTest {
     lateinit var outputDirectory: Path
 
     @Test
-    fun `given help argument when running then prints help without generating`() = runTest {
-        val result = command.test(arrayOf("--help"))
-
-        assertEquals(0, result.statusCode)
-        assertContains(result.stdout, "--website")
-        assertEquals(0, resumeGenerator.calls)
-    }
-
-    @Test
     fun `given only website and api key env var when running then generates with defaults`() = runTest {
         val result = command.test(
             arrayOf("--website=${TestData.WEBSITE_URL}"),

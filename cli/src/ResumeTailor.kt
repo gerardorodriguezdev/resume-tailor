@@ -30,6 +30,8 @@ internal class ResumeTailor(
 
     private val verbose by option("-v", "--verbose", help = "Log each generation step").flag()
 
+    override val printHelpOnEmptyArgs = true
+
     override suspend fun run() {
         val logger = EchoLogger(
             echo = { message -> echo(message) },
