@@ -63,7 +63,7 @@ internal class Notarize : CliktCommand() {
 
     private companion object {
         const val DISTRIBUTION_DIRECTORY = "dist"
-        const val INSTALLERS_GLOB = "*.{dmg,pkg}"
+        const val INSTALLERS_GLOB = "*.dmg"
         const val API_KEY_FILE_SUFFIX = ".p8"
         val JSON = Json { ignoreUnknownKeys = true }
     }

@@ -1,9 +1,12 @@
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import models.Section
 import testing.*
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ResumeGeneratorTest {
@@ -16,26 +19,17 @@ class ResumeGeneratorTest {
     private val htmlGenerator = FakeHtmlGenerator(result = HTML)
     private val htmlToPdfConverter = FakeHtmlToPdfConverter(result = TestData.PDF_BYTES)
     private val pdfSaver = FakePdfSaver()
-    private val generator = DefaultResumeGenerator(
-        logger = logger,
-        timeProvider = timeProvider,
-        mdFilesReader = mdFilesReader,
-        websiteScanner = websiteScanner,
-        agent = agent,
-        sectionsParser = sectionsParser,
-        htmlGenerator = htmlGenerator,
-        htmlToPdfConverter = htmlToPdfConverter,
-        pdfSaver = pdfSaver,
-    )
 
     @Test
     fun `given inputs when generating then calls all dependencies once with chained data`() = runTest {
-        generator.generate(
+        val result = createGenerator().generate(
             inputPath = TestData.INPUT_PATH,
             outputPath = TestData.OUTPUT_PATH,
             url = TestData.JOB_URL,
             fileName = TestData.FILE_NAME,
         )
+
+        assertTrue(result)
 
         assertEquals(1, mdFilesReader.calls)
         assertEquals(listOf(TestData.INPUT_PATH), mdFilesReader.inputPaths)
@@ -65,6 +59,35 @@ class ResumeGeneratorTest {
         assertEquals(TIMED_STEPS * 2, timeProvider.calls)
         assertTrue(logger.messages.all { "in " in it && "ms" in it })
     }
+
+    @Test
+    fun `given failing dependency when generating then returns false and stops`() = runTest {
+        websiteScanner.error = IllegalArgumentException("Invalid content")
+
+        val result = createGenerator().generate(
+            inputPath = TestData.INPUT_PATH,
+            outputPath = TestData.OUTPUT_PATH,
+            url = TestData.JOB_URL,
+            fileName = TestData.FILE_NAME,
+        )
+
+        assertFalse(result)
+        assertEquals(0, agent.calls)
+        assertEquals(0, pdfSaver.calls)
+    }
+
+    private fun TestScope.createGenerator() = DefaultResumeGenerator(
+        dispatcher = StandardTestDispatcher(testScheduler),
+        logger = logger,
+        timeProvider = timeProvider,
+        mdFilesReader = mdFilesReader,
+        websiteScanner = websiteScanner,
+        agent = agent,
+        sectionsParser = sectionsParser,
+        htmlGenerator = htmlGenerator,
+        htmlToPdfConverter = htmlToPdfConverter,
+        pdfSaver = pdfSaver,
+    )
 
     private companion object {
         const val MD_CONTENT = "# Resume"

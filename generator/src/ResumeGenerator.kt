@@ -1,8 +1,12 @@
 import ai.koog.utils.time.KoogClock
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.uuid.Uuid
 
 interface ResumeGenerator {
-    suspend fun generate(inputPath: String, outputPath: String, url: String, fileName: String)
+    suspend fun generate(inputPath: String, outputPath: String, url: String, fileName: String): Boolean
 
     companion object {
         fun build(apiKey: String, logger: Logger): ResumeGenerator {
@@ -22,6 +26,7 @@ interface ResumeGenerator {
             val htmlToPdfConverter = PlaywrightHtmlToPdfConverter()
             val pdfSaver = DefaultPdfSaver()
             return DefaultResumeGenerator(
+                dispatcher = Dispatchers.IO,
                 logger = logger,
                 timeProvider = timeProvider,
                 mdFilesReader = mdFilesReader,
@@ -37,6 +42,7 @@ interface ResumeGenerator {
 }
 
 internal class DefaultResumeGenerator(
+    private val dispatcher: CoroutineDispatcher,
     private val logger: Logger,
     private val timeProvider: TimeProvider,
     private val mdFilesReader: MdFilesReader,
@@ -48,7 +54,20 @@ internal class DefaultResumeGenerator(
     private val pdfSaver: PdfSaver,
 ) : ResumeGenerator {
 
-    override suspend fun generate(inputPath: String, outputPath: String, url: String, fileName: String) {
+    override suspend fun generate(inputPath: String, outputPath: String, url: String, fileName: String): Boolean =
+        withContext(dispatcher) {
+            try {
+                generateResume(inputPath = inputPath, outputPath = outputPath, url = url, fileName = fileName)
+                true
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                logger.debug { "Generation failed: ${error.message}" }
+                false
+            }
+        }
+
+    private suspend fun generateResume(inputPath: String, outputPath: String, url: String, fileName: String) {
         val mdFilesContent = timed("Markdown files read") {
             mdFilesReader.read(inputPath)
         }

@@ -2,8 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Resume Tailor: scrapes a job posting, tailors a Markdown resume with DeepSeek, and exports a PDF. Kotlin CLI + Compose
-Desktop GUI.
+Resume Tailor: scrapes a job posting, tailors a Markdown resume with DeepSeek, and exports a PDF. Kotlin Compose Desktop
+GUI.
 
 ## Build system
 
@@ -14,7 +14,6 @@ Desktop GUI.
 - The only registered check is `tests` — no lint or formatter, so style is enforced by review.
 - Modules:
     - `generator` — jvm/lib, core pipeline (no `main`).
-    - `cli` — jvm/app, `mainClass: EntrypointKt`.
     - `app` — jvm/app, Compose Desktop GUI.
     - `testing` — jvm/lib, shared test utilities, consumed via `test-dependencies: - //testing`.
     - `ci` — jvm/app, release automation for `deploy.yml`, run as `./kotlin run -m ci -- <command>`.
@@ -29,19 +28,16 @@ Desktop GUI.
 - One test class: `./kotlin test -m generator --include-classes 'ResumeGeneratorTest'`
 - One test method: `./kotlin test --include-test '<FQN with package and class>'`
 - E2E tests (skipped otherwise): `TEST_DEEPSEEK_API_KEY=... ./kotlin check`
-- Run CLI: `./kotlin run -m cli -- --website=<url> [--input --output --filename --apikey --verbose]` (parsed by clikt
-  in `cli/src/ResumeTailor.kt`; input/output default to the working dir, the API key falls back to the `API_KEY` env
-  var, then to a hidden prompt)
 - Run GUI: `./kotlin run -m app`; hot reload: `./kotlin run -m app --compose-hot-reload-mode` (auto-reload on save only
-  works via the IDE's "Run with Compose Hot Reload"; the CLI does not watch files)
+  works via the IDE's "Run with Compose Hot Reload"; the command line does not watch files)
 - List modules/checks: `./kotlin show modules`, `./kotlin show checks`
 
 ## Architecture
 
 Pipeline in `generator`: md files in input dir -> `WebsiteScanner` (Playwright) scrapes the job posting -> `Agent`
 (DeepSeek via koog-agents) produces JSON -> `SectionsParser` -> `HtmlGenerator` -> `HtmlToPdfConverter` (Playwright)
--> `PdfSaver`. Wired in `ResumeGenerator.build()`; each step is timed via the injected `TimeProvider`. `cli` and `app`
-are thin front-ends that validate input with `InputValidator` and call `ResumeGenerator`.
+-> `PdfSaver`. Wired in `ResumeGenerator.build()`; each step is timed via the injected `TimeProvider`. `app` is a thin
+front-end that validates input with `InputValidator` and calls `ResumeGenerator`.
 
 Conventions:
 
@@ -51,16 +47,22 @@ Conventions:
   factory is the only public entry point.
 - Visibility is `internal` by default. Only cross-module API is public: `ResumeGenerator`, `InputValidator`, `Logger`,
   `KotlinLogger`.
-- Packages: `generator` has none except `models`; `cli` has none; `app` is package-per-layer (`presentation`,
+- Packages: `generator` and `ci` have none except `generator`'s `models`; `app` is package-per-layer (`presentation`,
   `ui.screens`, `ui.models`, `ui.components`, `utils`); `testing` uses package `testing`.
-- Invalid input is rejected with `require { }` (throws `IllegalArgumentException`); tests rely on that. Exception: `cli`
+- Invalid input is rejected with `require { }` (throws `IllegalArgumentException`) inside internal components; tests
+  rely on that, and `ResumeGenerator.generate` turns it into `false`. Exception: `ci`
   validates options with clikt `.check { }`, which prints the error and exits with status 1.
 - Logging: `Logger` interface with lazy lambda messages; `KotlinLogger` delegates to kotlin-logging and gates on
-  `verbose`; `app`'s `logback.xml` routes only the `DefaultLogger` logger and silences everything else; `cli` logs
-  through
-  `EchoLogger` (clikt `echo`) and its `logback.xml` silences everything.
-- GUI: keep `DispatchersProvider` injectable in the ViewModel (never call `Dispatchers` directly); generation runs on
-  `DispatchersProvider.io.limitedParallelism(1)` so a new run cancels the previous one.
+  `verbose`; `app`'s `logback.xml` routes only the `DefaultLogger` logger and silences everything else.
+- Safe entry points: `ResumeGenerator.generate`, `UpdateChecker.newerVersionOrNull` and `UrlOpener.open` never throw (only
+  cancellation propagates) and switch to their own dispatcher internally, so callers launch them on `main` without
+  try/catch. `generate` returns `false` on failure and logs the cause via `Logger`.
+- GUI: keep `DispatchersProvider` injectable in the ViewModel (never call `Dispatchers` directly); the ViewModel
+  uses `viewModelScope`, built from `DispatchersProvider.main` via the `ViewModel(viewModelScope)` constructor, and a
+  new generation cancels the previous job.
+- GUI update check: `GitHubUpdateChecker` compares the `app.version` system property (set only by `jpackage
+  --java-options` in `deploy.yml`, so dev runs skip the check) with the latest GitHub release tag; the banner opens
+  the fixed `LATEST_RELEASE_URL`, never a URL from the API response.
 
 ## Security invariants (do not weaken)
 

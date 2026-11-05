@@ -29,7 +29,7 @@ jobs:
         run: ./kotlin check
 
       - name: Build
-        run: ./kotlin package --module app --module cli --format executable-jar
+        run: ./kotlin package --module app --format executable-jar
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -37,7 +37,6 @@ jobs:
           name: jars
           path: |
             build/tasks/_app_executableJarJvm/
-            build/tasks/_cli_executableJarJvm/
           if-no-files-found: error
           retention-days: 1
 
@@ -85,8 +84,7 @@ jobs:
           SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
         run: |
           ./kotlin run -m ci -- sign-nested-binaries \
-            build/tasks/_app_executableJarJvm/app-jvm-executable.jar \
-            build/tasks/_cli_executableJarJvm/cli-jvm-executable.jar
+            build/tasks/_app_executableJarJvm/app-jvm-executable.jar
 
       - name: Package app
         env:
@@ -101,26 +99,9 @@ jobs:
             --icon app/icon/icon.icns \
             --input build/tasks/_app_executableJarJvm \
             --main-jar app-jvm-executable.jar \
+            --java-options "-Dapp.version=$VERSION" \
             --dest dist \
             --mac-package-identifier "$BUNDLE_ID" \
-            --mac-sign \
-            --mac-signing-keychain "$KEYCHAIN" \
-            --mac-signing-key-user-name "$SIGNING_NAME"
-
-      - name: Package cli
-        env:
-          SIGNING_NAME: ${{ secrets.MACOS_SIGNING_NAME }}
-          BUNDLE_ID: ${{ secrets.MACOS_BUNDLE_ID }}
-          VERSION: ${{ steps.version.outputs.new_version }}
-        run: |
-          jpackage \
-            --type pkg \
-            --name resume-tailor \
-            --app-version "$VERSION" \
-            --input build/tasks/_cli_executableJarJvm \
-            --main-jar cli-jvm-executable.jar \
-            --dest dist \
-            --mac-package-identifier "$BUNDLE_ID.cli" \
             --mac-sign \
             --mac-signing-keychain "$KEYCHAIN" \
             --mac-signing-key-user-name "$SIGNING_NAME"
@@ -142,4 +123,4 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             dist/*.dmg
-            dist/*.pkg
+

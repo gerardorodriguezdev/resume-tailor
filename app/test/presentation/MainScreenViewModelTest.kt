@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import presentation.MainScreenViewModel.Companion.FAILED_GENERATE_MESSAGE
 import presentation.MainScreenViewModel.Companion.SUCCESSFUL_GENERATE_MESSAGE
 import testing.*
 import ui.screens.MainScreenEvent
@@ -15,7 +16,22 @@ class MainScreenViewModelTest {
     private val inputValidator = FakeInputValidator()
     private val pathPicker = FakePathPicker()
     private val resumeGenerator = FakeResumeGenerator()
+    private val updateChecker = FakeUpdateChecker()
+    private val urlOpener = FakeUrlOpener()
     private val providedApiKeys = mutableListOf<String>()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `given newer version available when downloading update then opens latest release url`() = runTest {
+        updateChecker.result = NEWER_VERSION
+        val viewModel = createViewModel()
+
+        advanceUntilIdle()
+        viewModel.onEvent(MainScreenEvent.DownloadUpdate)
+
+        assertEquals(NEWER_VERSION, viewModel.state.value.availableUpdateVersion)
+        assertEquals(listOf(MainScreenViewModel.LATEST_RELEASE_URL), urlOpener.openedUrls)
+    }
 
     @Test
     fun `given valid url change event when handling then updates url field as valid`() = runTest {
@@ -154,7 +170,7 @@ class MainScreenViewModelTest {
     @Test
     fun `given failing generator when generating then shows error notification`() = runTest {
         val viewModel = createViewModel()
-        resumeGenerator.error = IllegalStateException("boom")
+        resumeGenerator.result = false
         setValidState(viewModel)
 
         viewModel.onEvent(MainScreenEvent.Generate)
@@ -164,14 +180,14 @@ class MainScreenViewModelTest {
         assertFalse(viewModel.state.value.isGenerateButtonLoading)
         val notification = assertNotNull(viewModel.state.value.notificationMessage)
         assertTrue(notification.isError)
-        assertEquals("boom", notification.message)
+        assertEquals(FAILED_GENERATE_MESSAGE, notification.message)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `given dismiss notification event when handling then clears notification`() = runTest {
         val viewModel = createViewModel()
-        resumeGenerator.error = IllegalStateException("boom")
+        resumeGenerator.result = false
         setValidState(viewModel)
 
         viewModel.onEvent(MainScreenEvent.Generate)
@@ -189,6 +205,8 @@ class MainScreenViewModelTest {
             pathPicker = pathPicker,
             dispatchersProvider = TestDispatchersProvider(dispatcher),
             inputValidator = inputValidator,
+            updateChecker = updateChecker,
+            urlOpener = urlOpener,
             resumeGeneratorProvider = { apiKey ->
                 providedApiKeys.add(apiKey)
                 resumeGenerator
@@ -208,5 +226,6 @@ class MainScreenViewModelTest {
 
     private companion object {
         const val NEW_INPUT_PATH = "/tmp/other-input"
+        const val NEWER_VERSION = "1.2.3"
     }
 }

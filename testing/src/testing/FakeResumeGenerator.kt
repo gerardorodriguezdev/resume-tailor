@@ -3,7 +3,7 @@ package testing
 import ResumeGenerator
 
 class FakeResumeGenerator(
-    var error: Throwable? = null,
+    var result: Boolean = true,
 ) : ResumeGenerator {
     val inputPaths: List<String>
         field = MutableList(0) { "" }
@@ -16,12 +16,12 @@ class FakeResumeGenerator(
     var calls: Int = 0
         private set
 
-    override suspend fun generate(inputPath: String, outputPath: String, url: String, fileName: String) {
+    override suspend fun generate(inputPath: String, outputPath: String, url: String, fileName: String): Boolean {
         calls++
         inputPaths.add(inputPath)
         outputPaths.add(outputPath)
         urls.add(url)
         fileNames.add(fileName)
-        error?.let { throw it }
+        return result
     }
 }

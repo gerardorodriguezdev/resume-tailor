@@ -9,12 +9,18 @@ dependencies:
   - $libs.kotlinx.coroutines.swing
   - $libs.androidx.lifecycle.viewmodel.compose
   - $libs.kotlin.logging
+  - $kotlin.serialization.json
+  - $libs.ktor.client.core
+  - $libs.ktor.client.cio
 
 settings:
   compose: enabled
+  kotlin:
+    serialization: enabled
 
 test-dependencies:
   - //testing
   - $compose.uiTest
   - $libs.kotlinx.coroutines.test
   - $libs.junit.jupiter.params
+  - $libs.ktor.client.mock

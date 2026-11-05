@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import ui.components.Banner
 import ui.components.Button
 import ui.components.TextField
 import ui.models.Field
@@ -43,76 +44,20 @@ internal fun MainScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextField(
-                    placeholder = "Website url",
-                    field = state.urlField,
-                    onTextChanged = { onEvent(MainScreenEvent.ChangeUrl(it)) },
-                    supportingText = state.urlField.supportingText(invalidText = "Invalid URL"),
-                    modifier = Modifier.fillMaxWidth().testTag(MainScreenTestTags.URL_FIELD),
-                )
-
-                TextField(
-                    placeholder = "File name",
-                    field = state.fileNameField,
-                    onTextChanged = { onEvent(MainScreenEvent.ChangeFileName(it)) },
-                    supportingText = state.fileNameField.supportingText(
-                        templateText = state.fileNameField.value?.let { value -> "$value.pdf" } ?: "MyFileName.pdf",
-                        invalidText = "Invalid file name"
-                    ),
-                    modifier = Modifier.fillMaxWidth().testTag(MainScreenTestTags.FILE_NAME_FIELD),
-                )
-
-                TextField(
-                    placeholder = "Api key",
-                    field = state.apiKeyField,
-                    onTextChanged = { onEvent(MainScreenEvent.ChangeApiKey(it)) },
-                    supportingText = state.apiKeyField.supportingText(invalidText = "Invalid api key"),
-                    isPassword = true,
-                    modifier = Modifier.fillMaxWidth().testTag(MainScreenTestTags.API_KEY_FIELD),
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextField(
-                        placeholder = "Input folder",
-                        field = state.inputField,
-                        supportingText = state.inputField.supportingText(invalidText = "Invalid path"),
-                        readOnly = true,
-                        modifier = Modifier.weight(1f).testTag(MainScreenTestTags.INPUT_FIELD),
-                    )
-                    Button(
-                        text = "Browse",
-                        onClick = { onEvent(MainScreenEvent.OpenInputPathPicker) },
-                        modifier = Modifier.testTag(MainScreenTestTags.INPUT_BROWSE_BUTTON),
-                    )
+                state.availableUpdateVersion?.let { version ->
+                    UpdateBanner(version = version, onEvent = onEvent)
                 }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextField(
-                        placeholder = "Output folder",
-                        field = state.outputField,
-                        supportingText = state.outputField.supportingText(invalidText = "Invalid path"),
-                        readOnly = true,
-                        modifier = Modifier.weight(1f).testTag(MainScreenTestTags.OUTPUT_FIELD),
-                    )
-                    Button(
-                        text = "Browse",
-                        onClick = { onEvent(MainScreenEvent.OpenOutputPathPicker) },
-                        modifier = Modifier.testTag(MainScreenTestTags.OUTPUT_BROWSE_BUTTON),
-                    )
-                }
-
-                Button(
-                    text = "Generate",
+                
+                UrlField(field = state.urlField, onEvent = onEvent)
+                FileNameField(field = state.fileNameField, onEvent = onEvent)
+                ApiKeyField(field = state.apiKeyField, onEvent = onEvent)
+                InputFolderField(field = state.inputField, onEvent = onEvent)
+                OutputFolderField(field = state.outputField, onEvent = onEvent)
+                
+                GenerateButton(
                     isEnabled = state.isGenerateButtonEnabled,
                     isLoading = state.isGenerateButtonLoading,
-                    onClick = { onEvent(MainScreenEvent.Generate) },
-                    modifier = Modifier.testTag(MainScreenTestTags.GENERATE_BUTTON),
+                    onEvent = onEvent,
                 )
             }
         }
@@ -124,6 +69,116 @@ internal fun MainScreen(
             }
         }
     }
+}
+
+@Composable
+private fun UpdateBanner(version: String, onEvent: (MainScreenEvent) -> Unit) {
+    Banner(
+        text = "Version $version is available",
+        actionText = "Download",
+        onActionClick = { onEvent(MainScreenEvent.DownloadUpdate) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(MainScreenTestTags.UPDATE_BANNER),
+    )
+}
+
+@Composable
+private fun UrlField(field: Field<String>, onEvent: (MainScreenEvent) -> Unit) {
+    TextField(
+        placeholder = "Website url",
+        field = field,
+        onTextChanged = { onEvent(MainScreenEvent.ChangeUrl(it)) },
+        supportingText = field.supportingText(invalidText = "Invalid URL"),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(MainScreenTestTags.URL_FIELD),
+    )
+}
+
+@Composable
+private fun FileNameField(field: Field<String>, onEvent: (MainScreenEvent) -> Unit) {
+    TextField(
+        placeholder = "File name",
+        field = field,
+        onTextChanged = { onEvent(MainScreenEvent.ChangeFileName(it)) },
+        supportingText = field.supportingText(
+            templateText = field.value?.let { value -> "$value.pdf" } ?: "MyFileName.pdf",
+            invalidText = "Invalid file name"
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(MainScreenTestTags.FILE_NAME_FIELD),
+    )
+}
+
+@Composable
+private fun ApiKeyField(field: Field<String>, onEvent: (MainScreenEvent) -> Unit) {
+    TextField(
+        placeholder = "Api key",
+        field = field,
+        onTextChanged = { onEvent(MainScreenEvent.ChangeApiKey(it)) },
+        supportingText = field.supportingText(invalidText = "Invalid api key"),
+        isPassword = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(MainScreenTestTags.API_KEY_FIELD),
+    )
+}
+
+@Composable
+private fun InputFolderField(field: Field<String>, onEvent: (MainScreenEvent) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TextField(
+            placeholder = "Input folder",
+            field = field,
+            supportingText = field.supportingText(invalidText = "Invalid path"),
+            readOnly = true,
+            modifier = Modifier
+                .weight(1f)
+                .testTag(MainScreenTestTags.INPUT_FIELD),
+        )
+        Button(
+            text = "Browse",
+            onClick = { onEvent(MainScreenEvent.OpenInputPathPicker) },
+            modifier = Modifier.testTag(MainScreenTestTags.INPUT_BROWSE_BUTTON),
+        )
+    }
+}
+
+@Composable
+private fun OutputFolderField(field: Field<String>, onEvent: (MainScreenEvent) -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TextField(
+            placeholder = "Output folder",
+            field = field,
+            supportingText = field.supportingText(invalidText = "Invalid path"),
+            readOnly = true,
+            modifier = Modifier.weight(1f).testTag(MainScreenTestTags.OUTPUT_FIELD),
+        )
+        Button(
+            text = "Browse",
+            onClick = { onEvent(MainScreenEvent.OpenOutputPathPicker) },
+            modifier = Modifier.testTag(MainScreenTestTags.OUTPUT_BROWSE_BUTTON),
+        )
+    }
+}
+
+@Composable
+private fun GenerateButton(isEnabled: Boolean, isLoading: Boolean, onEvent: (MainScreenEvent) -> Unit) {
+    Button(
+        text = "Generate",
+        isEnabled = isEnabled,
+        isLoading = isLoading,
+        onClick = { onEvent(MainScreenEvent.Generate) },
+        modifier = Modifier.testTag(MainScreenTestTags.GENERATE_BUTTON),
+    )
 }
 
 private fun Field<String>.supportingText(
@@ -145,6 +200,7 @@ internal sealed interface MainScreenEvent {
     data object OpenOutputPathPicker : MainScreenEvent
     data object Generate : MainScreenEvent
     data object DismissNotification : MainScreenEvent
+    data object DownloadUpdate : MainScreenEvent
 }
 
 internal data class MainScreenState(
@@ -155,6 +211,7 @@ internal data class MainScreenState(
     val outputField: Field<String>,
     val notificationMessage: NotificationMessage?,
     val isGenerateButtonLoading: Boolean,
+    val availableUpdateVersion: String?,
 ) {
     val isGenerateButtonEnabled: Boolean =
         urlField.isValid && fileNameField.isValid && apiKeyField.isValid && inputField.isValid && outputField.isValid && !isGenerateButtonLoading
@@ -175,4 +232,5 @@ internal object MainScreenTestTags {
     const val OUTPUT_BROWSE_BUTTON = "MainScreen.outputBrowseButton"
     const val GENERATE_BUTTON = "MainScreen.generateButton"
     const val SNACKBAR = "MainScreen.snackbar"
+    const val UPDATE_BANNER = "MainScreen.updateBanner"
 }

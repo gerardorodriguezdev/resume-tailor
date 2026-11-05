@@ -121,6 +121,21 @@ class MainScreenTest {
         )
     }
 
+    @Test
+    fun `given no available update when rendering then hides update banner`() = runComposeUiTest {
+        setMainScreen(emptyState)
+
+        onNodeWithTag(MainScreenTestTags.UPDATE_BANNER).assertDoesNotExist()
+    }
+
+    @Test
+    fun `given available update when rendering then shows update banner with version`() = runComposeUiTest {
+        setMainScreen(emptyState.copy(availableUpdateVersion = NEWER_VERSION))
+
+        onNodeWithTag(MainScreenTestTags.UPDATE_BANNER).assertExists()
+        onNodeWithText("Version $NEWER_VERSION is available").assertExists()
+    }
+
     private fun ComposeUiTest.setMainScreen(
         state: MainScreenState,
         onEvent: (MainScreenEvent) -> Unit = { events.add(it) }
@@ -129,6 +144,8 @@ class MainScreenTest {
     }
 
     private companion object {
+        const val NEWER_VERSION = "1.2.3"
+
         val emptyState = MainScreenState(
             urlField = Field(value = null, isValid = false),
             fileNameField = Field(value = null, isValid = false),
@@ -137,6 +154,7 @@ class MainScreenTest {
             outputField = Field(value = null, isValid = false),
             notificationMessage = null,
             isGenerateButtonLoading = false,
+            availableUpdateVersion = null,
         )
 
         val completeState = MainScreenState(
@@ -147,6 +165,7 @@ class MainScreenTest {
             outputField = Field(value = TestData.OUTPUT_PATH, isValid = true),
             notificationMessage = null,
             isGenerateButtonLoading = false,
+            availableUpdateVersion = null,
         )
     }
 }

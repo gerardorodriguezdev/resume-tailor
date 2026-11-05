@@ -3,31 +3,38 @@ package presentation
 import InputValidator
 import ResumeGenerator
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ui.models.Field
 import ui.screens.MainScreenEvent
 import ui.screens.MainScreenState
 import utils.DispatchersProvider
 import utils.PathPicker
-import kotlin.coroutines.cancellation.CancellationException
+import utils.UpdateChecker
+import utils.UrlOpener
 
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
     private val dispatchersProvider: DispatchersProvider,
     private val inputValidator: InputValidator,
+    private val updateChecker: UpdateChecker,
+    private val urlOpener: UrlOpener,
     private val resumeGeneratorProvider: (apiKey: String) -> ResumeGenerator,
-) : ViewModel() {
-    private val asyncScope = CoroutineScope(dispatchersProvider.io.limitedParallelism(1))
+) : ViewModel(viewModelScope = CoroutineScope(dispatchersProvider.main + SupervisorJob())) {
     private var generateJob: Job? = null
 
     val state: StateFlow<MainScreenState>
         field = MutableStateFlow(initialState)
+
+    init {
+        checkForUpdate()
+    }
 
     fun onEvent(event: MainScreenEvent) {
         when (event) {
@@ -38,7 +45,23 @@ internal class MainScreenViewModel(
             is MainScreenEvent.OpenOutputPathPicker -> openOutputPathPicker()
             is MainScreenEvent.Generate -> generate()
             is MainScreenEvent.DismissNotification -> dismissError()
+            is MainScreenEvent.DownloadUpdate -> downloadUpdate()
         }
+    }
+
+    private fun checkForUpdate() {
+        viewModelScope.launch {
+            val newVersion = updateChecker.newerVersionOrNull()
+            showAvailableUpdate(newVersion)
+        }
+    }
+
+    private fun showAvailableUpdate(newVersion: String?) {
+        state.update { state -> state.copy(availableUpdateVersion = newVersion) }
+    }
+
+    private fun downloadUpdate() {
+        urlOpener.open(LATEST_RELEASE_URL)
     }
 
     private fun changeUrl(url: String) {
@@ -81,37 +104,18 @@ internal class MainScreenViewModel(
         updateLoading(true)
 
         val currentState = state.value
-        generateJob = asyncScope.launch {
-            try {
-                generate(
-                    apiKey = currentState.apiKeyField.value!!,
-                    inputPath = currentState.inputField.value!!,
-                    outputPath = currentState.outputField.value!!,
-                    url = currentState.urlField.value!!,
-                    fileName = currentState.fileNameField.value!!,
-                )
+        generateJob = viewModelScope.launch {
+            val resumeGenerator = resumeGeneratorProvider(currentState.apiKeyField.value!!)
+            val isSuccess = resumeGenerator.generate(
+                inputPath = currentState.inputField.value!!,
+                outputPath = currentState.outputField.value!!,
+                url = currentState.urlField.value!!,
+                fileName = currentState.fileNameField.value!!,
+            )
 
-                withContext(dispatchersProvider.main) {
-                    notifySuccess()
-                }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
-                notifyError(error.message)
-            } finally {
-                updateLoading(false)
-            }
+            if (isSuccess) notifySuccess() else notifyError()
+            updateLoading(false)
         }
-    }
-
-    private suspend fun generate(apiKey: String, inputPath: String, outputPath: String, url: String, fileName: String) {
-        val resumeGenerator = resumeGeneratorProvider(apiKey)
-        resumeGenerator.generate(
-            inputPath = inputPath,
-            outputPath = outputPath,
-            url = url,
-            fileName = fileName,
-        )
     }
 
     private fun updateLoading(isLoading: Boolean) {
@@ -129,11 +133,11 @@ internal class MainScreenViewModel(
         }
     }
 
-    private fun notifyError(error: String?) {
+    private fun notifyError() {
         state.update { state ->
             state.copy(
                 notificationMessage = MainScreenState.NotificationMessage(
-                    message = error ?: "Unknown error",
+                    message = FAILED_GENERATE_MESSAGE,
                     isError = true
                 )
             )
@@ -144,14 +148,11 @@ internal class MainScreenViewModel(
         state.update { state -> state.copy(notificationMessage = null) }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-
-        generateJob?.cancel()
-    }
-
     companion object {
         const val SUCCESSFUL_GENERATE_MESSAGE = "Generation successful"
+        const val FAILED_GENERATE_MESSAGE = "Generation failed"
+
+        const val LATEST_RELEASE_URL = "https://github.com/gerardorodriguezdev/resume-tailor/releases/latest"
 
         private val initialState = MainScreenState(
             urlField = Field(value = null, isValid = false),
@@ -161,6 +162,7 @@ internal class MainScreenViewModel(
             outputField = Field(value = null, isValid = false),
             notificationMessage = null,
             isGenerateButtonLoading = false,
+            availableUpdateVersion = null,
         )
     }
 }
