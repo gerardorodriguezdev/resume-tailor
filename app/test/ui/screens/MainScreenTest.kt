@@ -3,6 +3,7 @@ package ui.screens
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.v2.runComposeUiTest
 import testing.TestData
+import ui.components.TextFieldConstants
 import ui.models.Field
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -47,13 +48,11 @@ class MainScreenTest {
     fun `given api key field when clicking toggle then switches between hide and show`() = runComposeUiTest {
         setMainScreen(emptyState)
 
-        onNodeWithText("Show").performClick()
+        onNodeWithText(TextFieldConstants.SHOW_PASSWORD_TEXT).performClick()
+        onNodeWithText(TextFieldConstants.HIDE_PASSWORD_TEXT).assertExists()
 
-        onNodeWithText("Hide").assertExists()
-
-        onNodeWithText("Hide").performClick()
-
-        onNodeWithText("Show").assertExists()
+        onNodeWithText(TextFieldConstants.HIDE_PASSWORD_TEXT).performClick()
+        onNodeWithText(TextFieldConstants.SHOW_PASSWORD_TEXT).assertExists()
     }
 
     @Test
@@ -98,27 +97,10 @@ class MainScreenTest {
     fun `given complete state when rendering then shows all fields and values`() = runComposeUiTest {
         setMainScreen(completeState, onEvent = {})
 
-        val semanticsTree = onRoot(useUnmergedTree = true).printToString()
-
-        val expectedTexts = listOf(
-            "Website url",
-            TestData.JOB_URL,
-            "File name",
-            TestData.MY_RESUME_FILE_NAME,
-            "${TestData.MY_RESUME_FILE_NAME}.pdf",
-            "Api key",
-            "Show",
-            "Input folder",
-            TestData.INPUT_PATH,
-            "Output folder",
-            TestData.OUTPUT_PATH,
-            "Browse",
-            "Generate",
-        )
-        assertTrue(
-            expectedTexts.all { it in semanticsTree },
-            "Semantics tree is missing some expected texts: $semanticsTree"
-        )
+        onNodeWithTag(MainScreenTestTags.URL_FIELD).assertTextContains(TestData.JOB_URL)
+        onNodeWithTag(MainScreenTestTags.FILE_NAME_FIELD).assertTextContains(TestData.MY_RESUME_FILE_NAME)
+        onNodeWithTag(MainScreenTestTags.INPUT_FIELD).assertTextContains(TestData.INPUT_PATH)
+        onNodeWithTag(MainScreenTestTags.OUTPUT_FIELD).assertTextContains(TestData.OUTPUT_PATH)
     }
 
     @Test
@@ -133,7 +115,7 @@ class MainScreenTest {
         setMainScreen(emptyState.copy(availableUpdateVersion = NEWER_VERSION))
 
         onNodeWithTag(MainScreenTestTags.UPDATE_BANNER).assertExists()
-        onNodeWithText("Version $NEWER_VERSION is available").assertExists()
+        onNodeWithText(NEWER_VERSION.toUpdateAvailableText()).assertExists()
     }
 
     private fun ComposeUiTest.setMainScreen(

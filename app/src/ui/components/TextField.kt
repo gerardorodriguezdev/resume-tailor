@@ -38,7 +38,7 @@ internal fun TextField(
                     onClick = { isPasswordVisible = !isPasswordVisible },
                     modifier = Modifier.padding(end = 8.dp),
                 ) {
-                    Text(if (isPasswordVisible) "Hide" else "Show")
+                    Text(if (isPasswordVisible) TextFieldConstants.HIDE_PASSWORD_TEXT else TextFieldConstants.SHOW_PASSWORD_TEXT)
                 }
             }
         } else {
@@ -46,4 +46,9 @@ internal fun TextField(
         },
         modifier = modifier,
     )
+}
+
+internal object TextFieldConstants {
+    const val SHOW_PASSWORD_TEXT = "Show"
+    const val HIDE_PASSWORD_TEXT = "Hide"
 }

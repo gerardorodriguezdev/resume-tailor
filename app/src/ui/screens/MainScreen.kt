@@ -74,7 +74,7 @@ internal fun MainScreen(
 @Composable
 private fun UpdateBanner(version: String, onEvent: (MainScreenEvent) -> Unit) {
     Banner(
-        text = "Version $version is available",
+        text = version.toUpdateAvailableText(),
         actionText = "Download",
         onActionClick = { onEvent(MainScreenEvent.DownloadUpdate) },
         modifier = Modifier
@@ -180,6 +180,8 @@ private fun GenerateButton(isEnabled: Boolean, isLoading: Boolean, onEvent: (Mai
         modifier = Modifier.testTag(MainScreenTestTags.GENERATE_BUTTON),
     )
 }
+
+internal fun String.toUpdateAvailableText(): String = "Version $this is available"
 
 private fun Field<String>.supportingText(
     templateText: String? = null,
