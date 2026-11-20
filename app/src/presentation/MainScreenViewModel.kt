@@ -21,7 +21,7 @@ import utils.UrlOpener
 
 internal class MainScreenViewModel(
     private val pathPicker: PathPicker,
-    private val dispatchersProvider: DispatchersProvider,
+    dispatchersProvider: DispatchersProvider,
     private val inputValidator: InputValidator,
     private val updateChecker: UpdateChecker,
     private val urlOpener: UrlOpener,
@@ -156,7 +156,7 @@ internal class MainScreenViewModel(
 
         private val initialState = MainScreenState(
             urlField = Field(value = null, isValid = false),
-            fileNameField = Field(value = "Resume", isValid = false),
+            fileNameField = Field(value = "Resume", isValid = true),
             apiKeyField = Field(value = null, isValid = false),
             inputField = Field(value = null, isValid = false),
             outputField = Field(value = null, isValid = false),
